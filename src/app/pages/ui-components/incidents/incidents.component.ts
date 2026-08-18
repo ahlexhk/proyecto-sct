@@ -1,0 +1,211 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TablerIconsModule } from 'angular-tabler-icons';
+import {
+  ETIQUETA_ESTADO_INCIDENCIA,
+  ETIQUETA_PRIORIDAD,
+  Incident,
+  IncidentService,
+} from 'src/app/services/incident.service';
+import { NotificationService } from 'src/app/services/notification.service';
+
+@Component({
+  selector: 'app-incidents',
+  standalone: true,
+  templateUrl: './incidents.component.html',
+  styleUrls: ['./incidents.component.scss'],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    TablerIconsModule,
+  ],
+})
+export class IncidentsComponent implements OnInit {
+  incidents: Incident[] = [];
+  cargando = false;
+
+  // Filtros
+  filtroEstado = '';
+  filtroPrioridad = '';
+  soloMias = false;
+
+  // Alta de incidencia
+  mostrandoFormulario = false;
+  guardando = false;
+  incidentForm = new FormGroup({
+    titulo: new FormControl('', [Validators.required, Validators.maxLength(255)]),
+    descripcion: new FormControl('', Validators.required),
+    prioridad: new FormControl('media', Validators.required),
+    solicitante: new FormControl('', [Validators.required, Validators.maxLength(255)]),
+    ubicacion: new FormControl('', [Validators.required, Validators.maxLength(255)]),
+    bienNacional: new FormControl(''),
+  });
+
+  // Detalle seleccionado
+  seleccionada: Incident | null = null;
+  cargandoDetalle = false;
+  actualizando = false;
+  accionForm = new FormGroup({
+    estado: new FormControl(''),
+    comentario: new FormControl(''),
+  });
+
+  etiquetaEstado = ETIQUETA_ESTADO_INCIDENCIA;
+  etiquetaPrioridad = ETIQUETA_PRIORIDAD;
+
+  constructor(
+    private incidentService: IncidentService,
+    private notificationService: NotificationService,
+    private snackBar: MatSnackBar
+  ) { }
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.cargando = true;
+    this.incidentService.getIncidents({
+      estado: this.filtroEstado || undefined,
+      prioridad: this.filtroPrioridad || undefined,
+      asignado: this.soloMias ? 'me' : undefined,
+    }).subscribe({
+      next: (incidents) => {
+        this.cargando = false;
+        this.incidents = incidents;
+      },
+      error: () => {
+        this.cargando = false;
+        this.snackBar.open('Error al cargar las incidencias', 'Cerrar', { duration: 5000 });
+      },
+    });
+  }
+
+  cambiarFiltroEstado(estado: string): void {
+    this.filtroEstado = this.filtroEstado === estado ? '' : estado;
+    this.cargar();
+  }
+
+  toggleSoloMias(): void {
+    this.soloMias = !this.soloMias;
+    this.cargar();
+  }
+
+  toggleFormulario(): void {
+    this.mostrandoFormulario = !this.mostrandoFormulario;
+    if (!this.mostrandoFormulario) {
+      this.incidentForm.reset({ prioridad: 'media' });
+    }
+  }
+
+  crearIncidencia(): void {
+    if (this.incidentForm.invalid) {
+      this.incidentForm.markAllAsTouched();
+      this.snackBar.open('Completa los campos requeridos de la incidencia', 'Cerrar', { duration: 5000 });
+      return;
+    }
+    this.guardando = true;
+    const valores = this.incidentForm.value;
+    this.incidentService.createIncident({
+      titulo: valores.titulo!,
+      descripcion: valores.descripcion!,
+      prioridad: valores.prioridad!,
+      solicitante: valores.solicitante!,
+      ubicacion: valores.ubicacion!,
+      bienNacional: valores.bienNacional || null,
+    }).subscribe({
+      next: () => {
+        this.guardando = false;
+        this.snackBar.open('Incidencia registrada exitosamente', 'Cerrar', { duration: 5000 });
+        this.toggleFormulario();
+        this.cargar();
+        this.notificationService.refrescarAhora();
+      },
+      error: (error) => {
+        this.guardando = false;
+        this.snackBar.open(error.error?.error ?? 'Error al registrar la incidencia', 'Cerrar', { duration: 5000 });
+      },
+    });
+  }
+
+  verDetalle(incident: Incident): void {
+    if (this.seleccionada?.id === incident.id) {
+      this.seleccionada = null;
+      return;
+    }
+    this.cargandoDetalle = true;
+    this.seleccionada = incident;
+    this.accionForm.reset({ estado: '', comentario: '' });
+    this.incidentService.getIncident(incident.id).subscribe({
+      next: (detalle) => {
+        this.cargandoDetalle = false;
+        this.seleccionada = detalle;
+      },
+      error: () => {
+        this.cargandoDetalle = false;
+        this.snackBar.open('Error al cargar el detalle', 'Cerrar', { duration: 5000 });
+      },
+    });
+  }
+
+  tomarIncidencia(): void {
+    if (!this.seleccionada) return;
+    this.aplicarCambios({ asignarme: true, estado: this.seleccionada.estado === 'abierta' ? 'en_proceso' : undefined });
+  }
+
+  actualizarIncidencia(): void {
+    if (!this.seleccionada) return;
+    const { estado, comentario } = this.accionForm.value;
+    if (!estado && !comentario?.trim()) {
+      this.snackBar.open('Selecciona un estado o escribe un comentario', 'Cerrar', { duration: 5000 });
+      return;
+    }
+    this.aplicarCambios({
+      estado: estado || undefined,
+      comentario: comentario?.trim() || undefined,
+    });
+  }
+
+  private aplicarCambios(cambios: { estado?: string; asignarme?: boolean; comentario?: string }): void {
+    if (!this.seleccionada) return;
+    this.actualizando = true;
+    const id = this.seleccionada.id;
+    this.incidentService.updateIncident(id, cambios).subscribe({
+      next: () => {
+        this.actualizando = false;
+        this.snackBar.open('Incidencia actualizada', 'Cerrar', { duration: 4000 });
+        this.accionForm.reset({ estado: '', comentario: '' });
+        this.cargar();
+        this.notificationService.refrescarAhora();
+        // Recargar el detalle abierto
+        this.incidentService.getIncident(id).subscribe({
+          next: (detalle) => (this.seleccionada = detalle),
+        });
+      },
+      error: (error) => {
+        this.actualizando = false;
+        this.snackBar.open(error.error?.error ?? 'Error al actualizar la incidencia', 'Cerrar', { duration: 5000 });
+      },
+    });
+  }
+
+  esFinalizada(incident: Incident): boolean {
+    return incident.estado === 'resuelta' || incident.estado === 'cerrada';
+  }
+}

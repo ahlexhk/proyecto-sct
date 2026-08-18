@@ -4,6 +4,166 @@
   margin-top: 4px;
 }
 
+.dashboard-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* ---------- Métricas de soporte ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  .stat-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: rgba(0, 0, 0, 0.55);
+  }
+}
+
+.stat-abiertas { background: rgba(207, 34, 46, 0.06); .stat-value { color: #cf222e; } }
+.stat-proceso { background: rgba(30, 136, 229, 0.06); .stat-value { color: #1565c0; } }
+.stat-espera { background: rgba(255, 170, 0, 0.08); .stat-value { color: #9a6700; } }
+.stat-criticas { background: rgba(207, 34, 46, 0.1); .stat-value { color: #cf222e; } }
+.stat-resueltas { background: rgba(46, 160, 67, 0.08); .stat-value { color: #1a7f37; } }
+.stat-tiempo { background: rgba(0, 0, 0, 0.03); .stat-value { color: rgba(0, 0, 0, 0.75); } }
+
+/* ---------- Incidencias pendientes ---------- */
+.pending-title {
+  margin: 8px 0 12px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.loading-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.empty-pendientes {
+  text-align: center;
+  padding: 28px 16px;
+  color: rgba(0, 0, 0, 0.55);
+
+  .empty-title {
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .empty-hint {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+}
+
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pending-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 150ms ease-out, background 150ms ease-out;
+
+  &:hover {
+    border-color: #1e88e5;
+    background: rgba(30, 136, 229, 0.03);
+  }
+}
+
+.pending-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.pending-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.incident-id {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 600;
+}
+
+.pending-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+
+.pending-meta {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.55);
+
+  .assigned { color: #1e88e5; font-weight: 500; }
+  .unassigned { color: #cf222e; font-weight: 500; }
+}
+
+.chevron {
+  font-size: 1.4rem;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.priority-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.priority-baja { background: rgba(0, 0, 0, 0.06); color: rgba(0, 0, 0, 0.6); }
+.priority-media { background: rgba(30, 136, 229, 0.1); color: #1565c0; }
+.priority-alta { background: rgba(255, 170, 0, 0.15); color: #9a6700; }
+.priority-critica { background: rgba(207, 34, 46, 0.12); color: #cf222e; }
+
+.incident-status-abierta { background: rgba(207, 34, 46, 0.1); color: #cf222e; }
+.incident-status-en_proceso { background: rgba(30, 136, 229, 0.12); color: #1565c0; }
+.incident-status-en_espera { background: rgba(255, 170, 0, 0.15); color: #9a6700; }
+.incident-status-resuelta { background: rgba(46, 160, 67, 0.12); color: #1a7f37; }
+.incident-status-cerrada { background: rgba(0, 0, 0, 0.07); color: rgba(0, 0, 0, 0.55); }
+
 .search-container {
   display: flex;
   align-items: flex-start;

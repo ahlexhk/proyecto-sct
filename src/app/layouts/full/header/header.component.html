@@ -7,6 +7,47 @@
 
   <span class="flex-1-auto"></span>
 
+  <!-- Notificaciones de incidencias (solo con sesión) -->
+  <ng-container *ngIf="authService.isLoggedIn()">
+    <button mat-icon-button [matMenuTriggerFor]="notifmenu" aria-label="Notificaciones de incidencias"
+      (menuOpened)="notificationService.marcarLeidas()" class="notif-bell">
+      <i-tabler class="d-flex" name="bell"
+        [matBadge]="(notificationService.noLeidos$ | async) || null"
+        matBadgeColor="warn" matBadgeSize="small"></i-tabler>
+    </button>
+
+    <mat-menu #notifmenu="matMenu" xPosition="before" class="cardWithShadow notif-menu">
+      <div class="notif-header">
+        <span class="notif-title">Notificaciones</span>
+        <span class="notif-pending" *ngIf="(notificationService.pendientes$ | async) as pendientes">
+          {{ pendientes }} incidencia{{ pendientes === 1 ? '' : 's' }} pendiente{{ pendientes === 1 ? '' : 's' }}
+        </span>
+      </div>
+
+      <ng-container *ngIf="(notificationService.eventos$ | async) as eventos">
+        <div class="notif-empty" *ngIf="eventos.length === 0">
+          Sin actividad reciente. Aquí verás cuando pidan soporte.
+        </div>
+        <button mat-menu-item class="notif-item" *ngFor="let e of eventos" (click)="abrirIncidencia()">
+          <div class="notif-item-body">
+            <div class="notif-item-head">
+              <span class="notif-kind" [ngClass]="'kind-' + e.tipo">{{ descripcionEvento(e.tipo) }}</span>
+              <span class="notif-date">{{ e.created_at | date:'dd/MM HH:mm' }}</span>
+            </div>
+            <div class="notif-item-title">#{{ e.incident_id }} — {{ e.titulo }}</div>
+            <div class="notif-item-meta">{{ e.autor }}<span *ngIf="e.comentario"> · “{{ e.comentario }}”</span></div>
+          </div>
+        </button>
+      </ng-container>
+
+      <div class="notif-footer">
+        <button mat-stroked-button color="primary" class="w-100 btn-press" (click)="abrirIncidencia()">
+          Ver incidencias
+        </button>
+      </div>
+    </mat-menu>
+  </ng-container>
+
   <!-- Sesión iniciada: avatar con menú -->
   <ng-container *ngIf="authService.isLoggedIn(); else loginLink">
     <button class="m-l-10" mat-icon-button [matMenuTriggerFor]="profilemenu" aria-label="Menú de usuario">

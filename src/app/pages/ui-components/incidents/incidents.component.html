@@ -1,0 +1,236 @@
+<mat-card class="cardWithShadow theme-card page-enter">
+  <mat-card-header>
+    <div class="header-row">
+      <div>
+        <mat-card-title class="m-b-0 heading-display">Incidencias de soporte</mat-card-title>
+        <mat-card-subtitle class="section-subtitle">
+          Solicitudes de soporte técnico: registra, asigna y da seguimiento hasta su resolución
+        </mat-card-subtitle>
+      </div>
+      <button mat-raised-button color="primary" class="btn-press" (click)="toggleFormulario()">
+        {{ mostrandoFormulario ? 'Cancelar' : '+ Nueva incidencia' }}
+      </button>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="b-t-1">
+
+    <!-- Alta de incidencia -->
+    <div class="form-card card-enter" *ngIf="mostrandoFormulario">
+      <form [formGroup]="incidentForm" (ngSubmit)="crearIncidencia()">
+        <div class="row">
+          <div class="col-sm-6 col-lg-8">
+            <mat-form-field appearance="outline">
+              <mat-label>Título</mat-label>
+              <input matInput formControlName="titulo" placeholder="Resumen breve del problema" autocomplete="off">
+            </mat-form-field>
+          </div>
+          <div class="col-sm-6 col-lg-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Prioridad</mat-label>
+              <mat-select formControlName="prioridad">
+                <mat-option value="baja">Baja</mat-option>
+                <mat-option value="media">Media</mat-option>
+                <mat-option value="alta">Alta</mat-option>
+                <mat-option value="critica">Crítica</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-sm-12">
+            <mat-form-field appearance="outline">
+              <mat-label>Descripción</mat-label>
+              <textarea matInput formControlName="descripcion" rows="3"
+                placeholder="¿Qué ocurre? ¿Desde cuándo? ¿Qué se intentó?"></textarea>
+            </mat-form-field>
+          </div>
+          <div class="col-sm-6 col-lg-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Solicitante</mat-label>
+              <input matInput formControlName="solicitante" placeholder="Persona o departamento">
+            </mat-form-field>
+          </div>
+          <div class="col-sm-6 col-lg-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Ubicación</mat-label>
+              <input matInput formControlName="ubicacion">
+            </mat-form-field>
+          </div>
+          <div class="col-sm-6 col-lg-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Bien Nacional (opcional)</mat-label>
+              <input matInput formControlName="bienNacional" placeholder="Equipo del inventario afectado">
+              <mat-hint>Vincula la incidencia a un equipo registrado</mat-hint>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" class="btn-press" [disabled]="guardando">
+            {{ guardando ? 'Registrando…' : 'Registrar incidencia' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-row">
+      <div class="filter-chips">
+        <button type="button" class="filter-chip btn-press" [class.active]="filtroEstado === ''"
+          (click)="filtroEstado = ''; cargar()">Todas</button>
+        <button type="button" class="filter-chip btn-press" [class.active]="filtroEstado === 'abierta'"
+          (click)="cambiarFiltroEstado('abierta')">Abiertas</button>
+        <button type="button" class="filter-chip btn-press" [class.active]="filtroEstado === 'en_proceso'"
+          (click)="cambiarFiltroEstado('en_proceso')">En proceso</button>
+        <button type="button" class="filter-chip btn-press" [class.active]="filtroEstado === 'en_espera'"
+          (click)="cambiarFiltroEstado('en_espera')">En espera</button>
+        <button type="button" class="filter-chip btn-press" [class.active]="filtroEstado === 'resuelta'"
+          (click)="cambiarFiltroEstado('resuelta')">Resueltas</button>
+        <button type="button" class="filter-chip btn-press" [class.active]="filtroEstado === 'cerrada'"
+          (click)="cambiarFiltroEstado('cerrada')">Cerradas</button>
+      </div>
+      <div class="filter-side">
+        <mat-form-field appearance="outline" class="priority-filter">
+          <mat-label>Prioridad</mat-label>
+          <mat-select [value]="filtroPrioridad" (selectionChange)="filtroPrioridad = $event.value; cargar()">
+            <mat-option value="">Todas</mat-option>
+            <mat-option value="critica">Crítica</mat-option>
+            <mat-option value="alta">Alta</mat-option>
+            <mat-option value="media">Media</mat-option>
+            <mat-option value="baja">Baja</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button type="button" class="filter-chip btn-press" [class.active]="soloMias" (click)="toggleSoloMias()">
+          Mis incidencias
+        </button>
+      </div>
+    </div>
+
+    <!-- Cargando -->
+    <div class="loading-row" *ngIf="cargando">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Cargando incidencias…</span>
+    </div>
+
+    <!-- Vacío -->
+    <div class="empty-state card-enter" *ngIf="!cargando && incidents.length === 0">
+      <p class="empty-title">No hay incidencias con estos filtros</p>
+      <p class="empty-hint">Registra una nueva incidencia cuando llegue una solicitud de soporte.</p>
+    </div>
+
+    <!-- Lista -->
+    <div class="incident-list" *ngIf="!cargando">
+      <div class="incident-card card-enter" *ngFor="let inc of incidents"
+        [class.selected]="seleccionada?.id === inc.id" [class.finalizada]="esFinalizada(inc)">
+
+        <button type="button" class="incident-summary" (click)="verDetalle(inc)">
+          <div class="incident-main">
+            <div class="incident-title-row">
+              <span class="incident-id">#{{ inc.id }}</span>
+              <span class="incident-title">{{ inc.titulo }}</span>
+              <span class="priority-chip" [ngClass]="'priority-' + inc.prioridad">
+                {{ etiquetaPrioridad[inc.prioridad] }}
+              </span>
+              <span class="status-chip" [ngClass]="'incident-status-' + inc.estado">
+                {{ etiquetaEstado[inc.estado] }}
+              </span>
+            </div>
+            <div class="incident-meta">
+              <span>{{ inc.solicitante }}</span>
+              <span>·</span>
+              <span>{{ inc.ubicacion }}</span>
+              <span *ngIf="inc.bienNacional">·</span>
+              <span *ngIf="inc.bienNacional">Equipo {{ inc.bienNacional }}</span>
+              <span>·</span>
+              <span>{{ inc.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              <span *ngIf="inc.asignadoA">·</span>
+              <span *ngIf="inc.asignadoA" class="assigned">Asignada a {{ inc.asignadoA }}</span>
+            </div>
+          </div>
+          <span class="chevron" [class.open]="seleccionada?.id === inc.id">›</span>
+        </button>
+
+        <!-- Detalle expandido -->
+        <div class="incident-detail card-enter" *ngIf="seleccionada?.id === inc.id">
+          <div class="loading-row" *ngIf="cargandoDetalle">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span>Cargando detalle…</span>
+          </div>
+
+          <ng-container *ngIf="!cargandoDetalle && seleccionada">
+            <p class="incident-description">{{ seleccionada.descripcion }}</p>
+
+            <div class="detail-grid">
+              <div><span class="detail-label">Registrada por</span><span>{{ seleccionada.creadoPor }}</span></div>
+              <div *ngIf="seleccionada.tipoEquipo"><span class="detail-label">Equipo</span><span>{{ seleccionada.tipoEquipo }} ({{ seleccionada.bienNacional }})</span></div>
+              <div *ngIf="seleccionada.resuelto_at"><span class="detail-label">Resuelta</span><span>{{ seleccionada.resuelto_at | date:'dd/MM/yyyy HH:mm' }}</span></div>
+            </div>
+
+            <!-- Historial -->
+            <h4 class="timeline-title">Historial</h4>
+            <div class="timeline">
+              <div class="timeline-item" *ngFor="let h of seleccionada.historial">
+                <div class="timeline-dot" [ngClass]="'dot-' + h.tipo"></div>
+                <div class="timeline-content">
+                  <div class="timeline-head">
+                    <strong>{{ h.autor }}</strong>
+                    <span class="timeline-date">{{ h.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <div class="timeline-body">
+                    <ng-container [ngSwitch]="h.tipo">
+                      <span *ngSwitchCase="'creacion'">Registró la incidencia</span>
+                      <span *ngSwitchCase="'asignacion'">Tomó la incidencia</span>
+                      <span *ngSwitchCase="'cambio_estado'">
+                        Cambió el estado de
+                        <em>{{ h.estado_anterior ? etiquetaEstado[h.estado_anterior] : '—' }}</em> a
+                        <em>{{ h.estado_nuevo ? etiquetaEstado[h.estado_nuevo] : '—' }}</em>
+                      </span>
+                      <span *ngSwitchCase="'comentario'">Comentó</span>
+                    </ng-container>
+                    <p class="timeline-comment" *ngIf="h.comentario && h.tipo !== 'creacion' && h.tipo !== 'asignacion'">
+                      “{{ h.comentario }}”
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="action-bar" *ngIf="seleccionada.estado !== 'cerrada'; else reabrir">
+              <button mat-stroked-button color="primary" type="button" class="btn-press"
+                *ngIf="!seleccionada.asignado_a" (click)="tomarIncidencia()" [disabled]="actualizando">
+                Tomar incidencia
+              </button>
+              <form [formGroup]="accionForm" class="action-form" (ngSubmit)="actualizarIncidencia()">
+                <mat-form-field appearance="outline" class="action-estado">
+                  <mat-label>Cambiar estado</mat-label>
+                  <mat-select formControlName="estado">
+                    <mat-option value="">— Sin cambio —</mat-option>
+                    <mat-option value="en_proceso">En proceso</mat-option>
+                    <mat-option value="en_espera">En espera</mat-option>
+                    <mat-option value="resuelta">Resuelta</mat-option>
+                    <mat-option value="cerrada">Cerrada</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="action-comentario">
+                  <mat-label>Comentario</mat-label>
+                  <input matInput formControlName="comentario" placeholder="Qué se hizo o qué falta">
+                </mat-form-field>
+                <button mat-raised-button color="primary" type="submit" class="btn-press" [disabled]="actualizando">
+                  {{ actualizando ? 'Guardando…' : 'Actualizar' }}
+                </button>
+              </form>
+            </div>
+            <ng-template #reabrir>
+              <div class="action-bar">
+                <span class="closed-note">Incidencia cerrada.</span>
+                <button mat-stroked-button type="button" class="btn-press" [disabled]="actualizando"
+                  (click)="accionForm.patchValue({ estado: 'abierta' }); actualizarIncidencia()">
+                  Reabrir
+                </button>
+              </div>
+            </ng-template>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -3,6 +3,7 @@ import {
   Output,
   EventEmitter,
   Input,
+  OnInit,
   ViewEncapsulation,
 } from '@angular/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -11,6 +12,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { AuthService } from 'src/app/services/auth.service';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-header',
@@ -20,11 +22,12 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./header.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
 
   constructor(
     private router: Router,
-    public authService: AuthService
+    public authService: AuthService,
+    public notificationService: NotificationService
   ) { }
 
   @Input() showToggle = true;
@@ -32,6 +35,16 @@ export class HeaderComponent {
   @Output() toggleMobileNav = new EventEmitter<void>();
   @Output() toggleMobileFilterNav = new EventEmitter<void>();
   @Output() toggleCollapsed = new EventEmitter<void>();
+
+  ngOnInit(): void {
+    // Sondeo de notificaciones de incidencias (solo actúa con sesión activa)
+    this.notificationService.start();
+  }
+
+  abrirIncidencia(): void {
+    this.notificationService.marcarLeidas();
+    this.router.navigate(['/ui-components/incidents']);
+  }
 
   logout() {
     this.authService.logout();
@@ -53,5 +66,15 @@ export class HeaderComponent {
 
   getUserCargo(): string {
     return this.authService.getUser()?.cargo ?? '';
+  }
+
+  descripcionEvento(tipo: string): string {
+    switch (tipo) {
+      case 'creacion': return 'Nueva incidencia';
+      case 'asignacion': return 'Incidencia tomada';
+      case 'cambio_estado': return 'Cambio de estado';
+      case 'comentario': return 'Nuevo comentario';
+      default: return 'Actividad';
+    }
   }
 }

@@ -1,12 +1,21 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MaterialModule } from '../../material.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { Equipment, EquipmentService } from '../../services/equipment.service';
+import {
+  ETIQUETA_ESTADO_INCIDENCIA,
+  ETIQUETA_PRIORIDAD,
+  Incident,
+  IncidentService,
+  IncidentStats,
+} from '../../services/incident.service';
+import { AuthService } from '../../services/auth.service';
 
 const ETIQUETAS: Record<string, string> = {
   reubicacion: 'Reubicación',
@@ -26,6 +35,7 @@ const ETIQUETAS: Record<string, string> = {
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -36,13 +46,60 @@ const ETIQUETAS: Record<string, string> = {
   styleUrls: ['./starter.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class StarterComponent {
+export class StarterComponent implements OnInit {
+  // Búsqueda de equipos
   bienNacional: string = '';
   equipoEncontrado: Equipment | null = null;
   error: string = '';
   buscando = false;
 
-  constructor(private equipmentService: EquipmentService) { }
+  // Panel de soporte (solo con sesión)
+  stats: IncidentStats | null = null;
+  pendientes: Incident[] = [];
+  cargandoSoporte = false;
+
+  etiquetaEstadoIncidencia = ETIQUETA_ESTADO_INCIDENCIA;
+  etiquetaPrioridad = ETIQUETA_PRIORIDAD;
+
+  constructor(
+    private equipmentService: EquipmentService,
+    private incidentService: IncidentService,
+    public authService: AuthService
+  ) { }
+
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.cargarPanelSoporte();
+    }
+  }
+
+  cargarPanelSoporte(): void {
+    this.cargandoSoporte = true;
+    this.incidentService.getStats().subscribe({
+      next: (stats) => (this.stats = stats),
+      error: () => { },
+    });
+    this.incidentService.getIncidents().subscribe({
+      next: (incidents) => {
+        this.cargandoSoporte = false;
+        // Las pendientes primero (el backend ya ordena por estado y prioridad)
+        this.pendientes = incidents
+          .filter((i) => i.estado !== 'resuelta' && i.estado !== 'cerrada')
+          .slice(0, 5);
+      },
+      error: () => {
+        this.cargandoSoporte = false;
+      },
+    });
+  }
+
+  tiempoPromedio(): string {
+    const horas = Number(this.stats?.tiempoPromedioHoras);
+    if (!horas || isNaN(horas)) {
+      return '—';
+    }
+    return horas < 1 ? '< 1 h' : `${horas.toFixed(1)} h`;
+  }
 
   buscarEquipo() {
     this.equipoEncontrado = null;

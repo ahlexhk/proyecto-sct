@@ -1,3 +1,88 @@
+<!-- Panel de soporte técnico (solo con sesión) -->
+<mat-card class="cardWithShadow theme-card page-enter" *ngIf="authService.isLoggedIn()">
+  <mat-card-header>
+    <div class="dashboard-header-row">
+      <div>
+        <mat-card-title class="m-b-0 heading-display">Centro de soporte</mat-card-title>
+        <mat-card-subtitle class="dashboard-subtitle">
+          Estado actual de las solicitudes de soporte técnico
+        </mat-card-subtitle>
+      </div>
+      <a mat-raised-button color="primary" class="btn-press" [routerLink]="['/ui-components/incidents']">
+        Ver incidencias
+      </a>
+    </div>
+  </mat-card-header>
+  <mat-card-content class="b-t-1">
+
+    <!-- Métricas -->
+    <div class="stats-grid" *ngIf="stats">
+      <div class="stat-card stat-abiertas card-enter">
+        <span class="stat-value">{{ stats.abiertas }}</span>
+        <span class="stat-label">Abiertas</span>
+      </div>
+      <div class="stat-card stat-proceso card-enter">
+        <span class="stat-value">{{ stats.enProceso }}</span>
+        <span class="stat-label">En proceso</span>
+      </div>
+      <div class="stat-card stat-espera card-enter">
+        <span class="stat-value">{{ stats.enEspera }}</span>
+        <span class="stat-label">En espera</span>
+      </div>
+      <div class="stat-card stat-criticas card-enter">
+        <span class="stat-value">{{ stats.criticasAbiertas }}</span>
+        <span class="stat-label">Críticas activas</span>
+      </div>
+      <div class="stat-card stat-resueltas card-enter">
+        <span class="stat-value">{{ stats.resueltasHoy }}</span>
+        <span class="stat-label">Resueltas hoy</span>
+      </div>
+      <div class="stat-card stat-tiempo card-enter">
+        <span class="stat-value">{{ tiempoPromedio() }}</span>
+        <span class="stat-label">Tiempo prom. de resolución</span>
+      </div>
+    </div>
+
+    <!-- Incidencias pendientes -->
+    <h3 class="pending-title">Incidencias pendientes</h3>
+
+    <div class="loading-row" *ngIf="cargandoSoporte">
+      <mat-spinner diameter="28"></mat-spinner>
+      <span>Cargando incidencias…</span>
+    </div>
+
+    <div class="empty-pendientes card-enter" *ngIf="!cargandoSoporte && pendientes.length === 0">
+      <p class="empty-title">No hay incidencias pendientes 🎉</p>
+      <p class="empty-hint">Cuando pidan soporte, la incidencia aparecerá aquí y recibirás una notificación.</p>
+    </div>
+
+    <div class="pending-list" *ngIf="!cargandoSoporte && pendientes.length > 0">
+      <a class="pending-item card-enter" *ngFor="let inc of pendientes"
+        [routerLink]="['/ui-components/incidents']">
+        <div class="pending-main">
+          <div class="pending-title-row">
+            <span class="incident-id">#{{ inc.id }}</span>
+            <span class="pending-name">{{ inc.titulo }}</span>
+            <span class="priority-chip" [ngClass]="'priority-' + inc.prioridad">
+              {{ etiquetaPrioridad[inc.prioridad] }}
+            </span>
+            <span class="status-chip" [ngClass]="'incident-status-' + inc.estado">
+              {{ etiquetaEstadoIncidencia[inc.estado] }}
+            </span>
+          </div>
+          <div class="pending-meta">
+            {{ inc.solicitante }} · {{ inc.ubicacion }} · {{ inc.created_at | date:'dd/MM/yyyy HH:mm' }}
+            <span *ngIf="inc.asignadoA" class="assigned"> · {{ inc.asignadoA }}</span>
+            <span *ngIf="!inc.asignadoA" class="unassigned"> · Sin asignar</span>
+          </div>
+        </div>
+        <span class="chevron">›</span>
+      </a>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<!-- Consulta de equipos (pública) -->
 <mat-card class="cardWithShadow theme-card page-enter">
   <mat-card-header>
     <div>

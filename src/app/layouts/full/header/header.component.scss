@@ -47,6 +47,90 @@
   }
 }
 
+/* Menú de notificaciones de incidencias */
+.notif-menu {
+  min-width: 340px;
+  max-width: 380px;
+}
+
+.notif-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+  .notif-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
+  }
+
+  .notif-pending {
+    font-size: 0.75rem;
+    color: #cf222e;
+    font-weight: 600;
+  }
+}
+
+.notif-empty {
+  padding: 20px 16px;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.notif-item {
+  height: auto !important;
+  line-height: 1.35 !important;
+  padding: 10px 16px !important;
+  white-space: normal !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.notif-item-body {
+  width: 100%;
+}
+
+.notif-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notif-kind {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &.kind-creacion { color: #cf222e; }
+  &.kind-asignacion { color: #1e88e5; }
+  &.kind-cambio_estado { color: #9a6700; }
+  &.kind-comentario { color: rgba(0, 0, 0, 0.55); }
+}
+
+.notif-date {
+  font-size: 0.72rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.notif-item-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.notif-item-meta {
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.55);
+  margin-top: 1px;
+}
+
+.notif-footer {
+  padding: 10px 16px;
+}
+
 .user-summary {
   min-width: 180px;
   padding-bottom: 8px;

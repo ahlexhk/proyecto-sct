@@ -11,6 +11,15 @@ export const navItems: NavItem[] = [
     route: '/dashboard',
   },
   {
+    navCap: 'Soporte técnico',
+  },
+  {
+    displayName: 'Incidencias',
+    iconName: 'alert-circle',
+    bgcolor: 'primary',
+    route: '/ui-components/incidents',
+  },
+  {
     navCap: 'Inventario',
   },
   {
