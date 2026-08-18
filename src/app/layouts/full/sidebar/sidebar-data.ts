@@ -2,51 +2,49 @@ import { NavItem } from './nav-item/nav-item';
 
 export const navItems: NavItem[] = [
   {
-    navCap: 'Home',
+    navCap: 'Inicio',
   },
   {
-    displayName: 'Dashboard',
-    iconName: 'layout-dashboard',
+    displayName: 'Consulta de equipos',
+    iconName: 'search',
     bgcolor: 'primary',
     route: '/dashboard',
   },
   {
-    navCap: 'Ui Components',
+    navCap: 'Inventario',
   },
-
-   {
-    displayName: 'Registro',
-    iconName: 'poker-chip',
+  {
+    displayName: 'Registro de equipos',
+    iconName: 'clipboard-plus',
     bgcolor: 'primary',
     route: '/ui-components/equipmentRegister',
   },
   {
-    displayName: 'Control',
-    iconName: 'poker-chip',
+    displayName: 'Control de equipos',
+    iconName: 'adjustments',
     bgcolor: 'primary',
     route: '/ui-components/control',
   },
   {
     displayName: 'Reportes',
-    iconName: 'poker-chip',
+    iconName: 'report-analytics',
     bgcolor: 'primary',
     route: '/ui-components/reports',
   },
 
   {
-    navCap: 'Auth',
+    navCap: 'Cuenta',
   },
   {
-    displayName: 'Login',
+    displayName: 'Iniciar sesión',
     iconName: 'lock',
     bgcolor: 'accent',
     route: '/authentication/login',
   },
   {
-    displayName: 'Register',
+    displayName: 'Registrarse',
     iconName: 'user-plus',
     bgcolor: 'warning',
     route: '/authentication/register',
   },
-
 ];

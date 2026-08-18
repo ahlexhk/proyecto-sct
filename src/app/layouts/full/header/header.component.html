@@ -5,46 +5,31 @@
     <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
   </button>
 
-
-  <!-- <button mat-icon-button aria-label="Notifications">
-    <i-tabler class="d-flex" name="bell" matBadge="1" matBadgeColor="primary"></i-tabler>
-  </button> -->
-
-
   <span class="flex-1-auto"></span>
 
-  <!-- --------------------------------------------------------------- -->
-  <!-- profile Dropdown -->
-  <!-- --------------------------------------------------------------- -->
-  <!-- <a mat-flat-button color="primary" href="https://www.wrappixel.com/templates/spike-free-angular-admin-template/?ref=33"
-    target="_blank" class="d-flex justify-content-center">
-    Download Free
-  </a> -->
-
-
-<!-- En header.component.html -->
-<button class="m-l-10" mat-icon-button [matMenuTriggerFor]="profilemenu" aria-label="Notifications">
-  <div class="initials-circle" *ngIf="authService.isLoggedIn()">
-    <span class="initials-text">{{getUserInitials()}}</span>
-  </div>
-</button>
-
-  <mat-menu #profilemenu="matMenu" xPosition="before" class="cardWithShadow">
-    <!-- <button mat-menu-item>
-      <mat-icon class="d-flex align-items-center"><i-tabler name="user" class="icon-18 d-flex"></i-tabler></mat-icon>My
-      Profile
+  <!-- Sesión iniciada: avatar con menú -->
+  <ng-container *ngIf="authService.isLoggedIn(); else loginLink">
+    <button class="m-l-10" mat-icon-button [matMenuTriggerFor]="profilemenu" aria-label="Menú de usuario">
+      <div class="initials-circle">
+        <span class="initials-text">{{ getUserInitials() }}</span>
+      </div>
     </button>
-    <button mat-menu-item>
-      <mat-icon class="d-flex align-items-center"><i-tabler name="mail" class="icon-18 d-flex"></i-tabler></mat-icon>My
-      Account
-    </button>
-    <button mat-menu-item>
-      <mat-icon class="d-flex align-items-center"><i-tabler name="list-check"
-          class="icon-18 d-flex"></i-tabler></mat-icon>My Task
-    </button> -->
 
-    <div class="p-x-12 ">
-      <button mat-stroked-button color="primary" class="w-100" (click)="logout()">Logout</button>
-    </div>
-  </mat-menu>
+    <mat-menu #profilemenu="matMenu" xPosition="before" class="cardWithShadow">
+      <div class="p-x-12 p-y-8 user-summary" *ngIf="getUserName()">
+        <div class="user-name">{{ getUserName() }}</div>
+        <div class="user-cargo">{{ getUserCargo() }}</div>
+      </div>
+      <div class="p-x-12">
+        <button mat-stroked-button color="primary" class="w-100 btn-press" (click)="logout()">Cerrar sesión</button>
+      </div>
+    </mat-menu>
+  </ng-container>
+
+  <!-- Sin sesión: acceso directo al login -->
+  <ng-template #loginLink>
+    <a mat-stroked-button color="primary" class="btn-press" [routerLink]="['/authentication/login']">
+      Iniciar sesión
+    </a>
+  </ng-template>
 </mat-toolbar>

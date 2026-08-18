@@ -1,60 +1,86 @@
-<mat-card class="cardWithShadow theme-card">
+<mat-card class="cardWithShadow theme-card page-enter">
     <mat-card-header>
-        <mat-card-title class="m-b-0">Registro de equipos</mat-card-title>
+        <div>
+            <mat-card-title class="m-b-0 heading-display">Registro de equipos</mat-card-title>
+            <mat-card-subtitle class="section-subtitle">Da de alta un equipo en el inventario con su Bien Nacional</mat-card-subtitle>
+        </div>
     </mat-card-header>
     <mat-card-content class="b-t-1">
         <form [formGroup]="equipmentForm" (ngSubmit)="onSubmit()">
             <div class="row">
                 <div class="col-sm-6 col-lg-4">
-                    <mat-form-field>
+                    <mat-form-field appearance="outline">
                         <mat-label>Bien Nacional</mat-label>
-                        <input matInput formControlName="bienNacional" type="text">
+                        <input matInput formControlName="bienNacional" type="text" autocomplete="off">
+                        @if (equipmentForm.controls.bienNacional.touched && equipmentForm.controls.bienNacional.hasError('required')) {
+                            <mat-error>El Bien Nacional es requerido</mat-error>
+                        }
                     </mat-form-field>
                 </div>
                 <div class="col-sm-6 col-lg-4">
-                    <mat-form-field>
+                    <mat-form-field appearance="outline">
                         <mat-label>Tipo de Equipo</mat-label>
-                        <input matInput formControlName="tipoEquipo" type="text">
+                        <input matInput formControlName="tipoEquipo" type="text" placeholder="Laptop, impresora, router…">
+                        @if (equipmentForm.controls.tipoEquipo.touched && equipmentForm.controls.tipoEquipo.hasError('required')) {
+                            <mat-error>El tipo de equipo es requerido</mat-error>
+                        }
                     </mat-form-field>
                 </div>
                 <div class="col-sm-6 col-lg-4">
-                    <mat-form-field>
+                    <mat-form-field appearance="outline">
                         <mat-label>Número de Serie</mat-label>
-                        <input matInput formControlName="numeroSerie" type="number">
+                        <input matInput formControlName="numeroSerie" type="text" autocomplete="off">
+                        @if (equipmentForm.controls.numeroSerie.touched && equipmentForm.controls.numeroSerie.hasError('required')) {
+                            <mat-error>El número de serie es requerido</mat-error>
+                        }
                     </mat-form-field>
                 </div>
                 <div class="col-sm-6 col-lg-4">
-                    <mat-form-field>
+                    <mat-form-field appearance="outline">
                         <mat-label>Estado</mat-label>
                         <mat-select formControlName="estado">
-                            <mat-option value="opertativo">Operativo</mat-option>
+                            <mat-option value="operativo">Operativo</mat-option>
                             <mat-option value="reparacion">Reparación</mat-option>
                             <mat-option value="inoperativo">Inoperativo</mat-option>
                         </mat-select>
+                        @if (equipmentForm.controls.estado.touched && equipmentForm.controls.estado.hasError('required')) {
+                            <mat-error>El estado es requerido</mat-error>
+                        }
                     </mat-form-field>
                 </div>
                 <div class="col-sm-6 col-lg-4">
-                    <mat-form-field>
+                    <mat-form-field appearance="outline">
                         <mat-label>Ubicación</mat-label>
                         <input matInput formControlName="ubicacion" type="text">
+                        @if (equipmentForm.controls.ubicacion.touched && equipmentForm.controls.ubicacion.hasError('required')) {
+                            <mat-error>La ubicación es requerida</mat-error>
+                        }
                     </mat-form-field>
                 </div>
                 <div class="col-sm-6 col-lg-4">
-                    <mat-form-field>
+                    <mat-form-field appearance="outline">
                         <mat-label>Asignación</mat-label>
                         <input matInput formControlName="asignacion" type="text">
+                        @if (equipmentForm.controls.asignacion.touched && equipmentForm.controls.asignacion.hasError('required')) {
+                            <mat-error>La asignación es requerida</mat-error>
+                        }
                     </mat-form-field>
                 </div>
-                <div class="col-sm-6 col-lg-4">
-                    <mat-form-field>
+                <div class="col-sm-12">
+                    <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Características</mat-label>
-                        <textarea matInput formControlName="caracteristicas" required></textarea>
+                        <textarea matInput formControlName="caracteristicas" rows="3"
+                            placeholder="Procesador, memoria, accesorios, detalles físicos…"></textarea>
+                        @if (equipmentForm.controls.caracteristicas.touched && equipmentForm.controls.caracteristicas.hasError('required')) {
+                            <mat-error>Las características son requeridas</mat-error>
+                        }
                     </mat-form-field>
                 </div>
-
             </div>
-            <div style="margin: auto;">
-                <button mat-raised-button color="primary" type="submit">Enviar</button>
+            <div class="form-actions">
+                <button mat-raised-button color="primary" type="submit" class="btn-press" [disabled]="guardando">
+                    {{ guardando ? 'Guardando…' : 'Registrar equipo' }}
+                </button>
             </div>
         </form>
     </mat-card-content>

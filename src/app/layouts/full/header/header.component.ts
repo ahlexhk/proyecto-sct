@@ -22,11 +22,10 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class HeaderComponent {
 
-    constructor(
-      private router: Router,
-      public authService: AuthService
-    ) { }
-  
+  constructor(
+    private router: Router,
+    public authService: AuthService
+  ) { }
 
   @Input() showToggle = true;
   @Input() toggleChecked = false;
@@ -34,20 +33,25 @@ export class HeaderComponent {
   @Output() toggleMobileFilterNav = new EventEmitter<void>();
   @Output() toggleCollapsed = new EventEmitter<void>();
 
-
   logout() {
     this.authService.logout();
-    this.router.navigate(['/dashboard']); 
+    this.router.navigate(['/dashboard']);
   }
-
 
   getUserInitials(): string {
-    const user = localStorage.getItem('user');
+    const user = this.authService.getUser();
     if (user) {
-      const userData = JSON.parse(user);
-      return userData.nombre.charAt(0) + userData.apellido.charAt(0);
+      return (user.nombre?.charAt(0) ?? '') + (user.apellido?.charAt(0) ?? '');
     }
-    return 'UA'; // Iniciales por defecto si no hay usuario
+    return 'UA';
+  }
+
+  getUserName(): string {
+    const user = this.authService.getUser();
+    return user ? `${user.nombre} ${user.apellido}` : '';
+  }
+
+  getUserCargo(): string {
+    return this.authService.getUser()?.cargo ?? '';
   }
 }
-  

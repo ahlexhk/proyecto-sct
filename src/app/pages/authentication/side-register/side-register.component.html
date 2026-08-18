@@ -41,13 +41,6 @@
                         <app-error-messages [control]="f['dni']"></app-error-messages>
                       </mat-form-field>
 
-                      <!-- Email -->
-                      <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Correo electrónico</mat-label>
-                      <mat-form-field appearance="outline" class="w-100" color="primary">
-                        <input matInput formControlName="email" />
-                        <app-error-messages [control]="f['email']"></app-error-messages>
-                      </mat-form-field>
-
                       <!-- Cargo -->
                       <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Cargo</mat-label>
                       <mat-form-field appearance="outline" class="w-100" color="primary">
@@ -63,7 +56,7 @@
                       </mat-form-field>
 
                       <!-- Botón de registro -->
-                      <button mat-flat-button color="primary" class="w-100" [disabled]="!form.valid">
+                      <button mat-flat-button color="primary" class="w-100 btn-press" [disabled]="!form.valid">
                         Registrarse
                       </button>
 

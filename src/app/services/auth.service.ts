@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
 const apiUrl = `${environment.apiUrl}/users`; // URL del backend
@@ -23,17 +22,15 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private authState = new BehaviorSubject<boolean>(this.getAuthState()); // Inicializar con el estado persistido
+  private authState = new BehaviorSubject<boolean>(this.hasValidToken());
   authState$ = this.authState.asObservable();
   private userSubject = new BehaviorSubject<any>(null);
   public user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
-
     const user = localStorage.getItem('user');
-    
     if (user) {
-      this.userSubject.next(JSON.parse(user)); // Actualizar el estado con el usuario almacenado
+      this.userSubject.next(JSON.parse(user));
     }
   }
 
@@ -41,28 +38,30 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+  // Un usuario está logueado solo si su token existe y no ha expirado.
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return this.hasValidToken();
   }
 
   isAuthenticated(): boolean {
-    const isAuth = this.getAuthState(); // Usar el estado persistido
+    const isAuth = this.hasValidToken();
     this.authState.next(isAuth);
     return isAuth;
+  }
+
+  getUser(): { id: number; nombre: string; apellido: string; dni: string; cargo: string } | null {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 
   register(user: any): Observable<any> {
     return this.http.post(`${apiUrl}/register`, user)
       .pipe(
-        map(response => {
-          return response;
-        }),
         catchError(error => {
           if (error.error && error.error.error === 'El DNI ya está registrado') {
-            return throwError({ error: 'El DNI ya está registrado' });
-          } else {
-            return throwError(error);
+            return throwError(() => ({ error: 'El DNI ya está registrado' }));
           }
+          return throwError(() => error);
         })
       );
   }
@@ -73,43 +72,43 @@ export class AuthService {
         map(response => {
           localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
-          this.setAuthState(true); // Persistir el estado
-          
+          this.userSubject.next(response.user);
           this.authState.next(true);
           return response;
-        }),
-        catchError(this.handleError)
+        })
       );
-  }
-
-  private handleError(error: any) {
-    if (error.status === 401) {
-      this.logout();
-      this.router.navigate(['/authentication/login']);
-    }
-    return throwError('Something bad happened; please try again later.');
   }
 
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    this.setAuthState(false); // Persistir el estado
+    this.userSubject.next(null);
     this.authState.next(false);
   }
 
+  // Mantenido por compatibilidad; el authInterceptor ya adjunta el token
+  // automáticamente a todas las peticiones hacia la API.
   getHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
+  }
+
+  // Decodifica el payload del JWT y verifica su expiración localmente.
+  private hasValidToken(): boolean {
     const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
-  private setAuthState(state: boolean) {
-    localStorage.setItem('authState', JSON.stringify(state));
-  }
-
-  private getAuthState(): boolean {
-    const authState = localStorage.getItem('authState');
-    return authState ? JSON.parse(authState) : false;
+    if (!token) {
+      return false;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

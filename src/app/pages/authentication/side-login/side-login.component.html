@@ -49,8 +49,8 @@
                       </mat-form-field>
 
                       <!-- Botón de inicio de sesión -->
-                      <button mat-flat-button color="primary" class="w-100" [disabled]="!form.valid">
-                        Iniciar sesión
+                      <button mat-flat-button color="primary" class="w-100 btn-press" [disabled]="!form.valid || enviando">
+                        {{ enviando ? 'Iniciando…' : 'Iniciar sesión' }}
                       </button>
                     </form>
 

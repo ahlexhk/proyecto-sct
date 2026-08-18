@@ -1,6 +1,11 @@
-<mat-card class="cardWithShadow theme-card">
+<mat-card class="cardWithShadow theme-card page-enter">
   <mat-card-header>
-    <mat-card-title class="m-b-0">Reporte Completo</mat-card-title>
+    <div>
+      <mat-card-title class="m-b-0 heading-display">Reportes</mat-card-title>
+      <mat-card-subtitle class="section-subtitle">
+        Genera el historial de movimientos del inventario en un período y descárgalo en PDF o Excel
+      </mat-card-subtitle>
+    </div>
   </mat-card-header>
   <mat-card-content class="b-t-1">
     <form [formGroup]="reportForm" (ngSubmit)="generarReporte()">
@@ -22,10 +27,17 @@
           </mat-form-field>
         </div>
         <div class="col-sm-6 col-lg-4">
-          <button mat-raised-button color="primary" type="submit">Generar Reporte</button>
+          <button mat-raised-button color="primary" type="submit" class="btn-press" [disabled]="cargando">
+            {{ cargando ? 'Generando…' : 'Generar Reporte' }}
+          </button>
         </div>
       </div>
     </form>
+
+    <div class="loading-row" *ngIf="cargando">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Consultando reportes…</span>
+    </div>
 
     <!-- Reporte de Equipos Reparados -->
     <div *ngIf="reparadosData">
@@ -74,8 +86,8 @@
         <table mat-table [dataSource]="reubicadosData" class="mat-elevation-z8">
           <!-- Definir las columnas de la tabla -->
           <ng-container matColumnDef="equipo">
-            <th mat-header-cell *matHeaderCellDef>Equipo</th>
-            <td mat-cell *matCellDef="let item">{{ item.equipo }}</td>
+            <th mat-header-cell *matHeaderCellDef>Bien Nacional</th>
+            <td mat-cell *matCellDef="let item">{{ item.bienNacional || item.equipo }}</td>
           </ng-container>
           <ng-container matColumnDef="ubicacionAnterior">
             <th mat-header-cell *matHeaderCellDef>Ubicación Anterior</th>
@@ -115,9 +127,10 @@
 
     
     <!-- Botones de descarga -->
-    <div class="download-button" *ngIf="reparadosData || tiempoReparacionData || reubicadosData || retirosReparacionData">
-          <button class="download-button"  mat-raised-button color="accent" (click)="descargarPDF()">Descargar PDF</button>
-          <button class="download-button"  mat-raised-button color="accent" (click)="descargarExcel()">Descargar Excel</button>
-        </div>
+    <div class="download-actions"
+      *ngIf="!cargando && (reparadosData || tiempoReparacionData || reubicadosData || retirosReparacionData)">
+      <button mat-raised-button color="accent" class="btn-press" (click)="descargarPDF()">Descargar PDF</button>
+      <button mat-raised-button color="accent" class="btn-press" (click)="descargarExcel()">Descargar Excel</button>
+    </div>
   </mat-card-content>
 </mat-card>

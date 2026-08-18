@@ -1,66 +1,54 @@
-<mat-card class="cardWithShadow theme-card">
+<mat-card class="cardWithShadow theme-card page-enter">
   <mat-card-header>
-    <mat-card-title class="m-b-0">Editar Estado, Ubicación y Asignación</mat-card-title>
+    <div>
+      <mat-card-title class="m-b-0 heading-display">Control de equipos</mat-card-title>
+      <mat-card-subtitle class="section-subtitle">
+        Busca un equipo por Bien Nacional y registra cambios de estado, ubicación o asignación
+      </mat-card-subtitle>
+    </div>
   </mat-card-header>
   <mat-card-content class="b-t-1">
     <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
-      <div class="row">
-        <!-- Buscar equipo por Bien Nacional -->
-        <div [ngClass]="{
-  'col-sm-6 col-lg-4 search-container': equipment,
-  ' col-sm-12': !equipment
-}">
-          <div [ngClass]="{
-  ' ': equipment,
-  'row': !equipment
-}">
-            <div [ngClass]="{
-  ' ': equipment,
-  'col-md-8': !equipment
-}">
-              <mat-form-field class="search-field">
-                <mat-label>Buscar por Bien Nacional</mat-label>
-                <input matInput formControlName="bienNacional" required>
-              </mat-form-field>
-            </div>
-            <div class="col-md-4">
-              <button mat-raised-button color="primary" (click)="searchEquipment()" *ngIf="!equipment"
-                class="search-button">Buscar</button>
 
-            </div>
+      <!-- Buscar equipo por Bien Nacional -->
+      <div class="search-row" *ngIf="!equipment">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar por Bien Nacional</mat-label>
+          <input matInput formControlName="bienNacional" autocomplete="off"
+            (keydown.enter)="$event.preventDefault(); searchEquipment()">
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="button" class="btn-press search-button"
+          (click)="searchEquipment()" [disabled]="buscando">
+          {{ buscando ? 'Buscando…' : 'Buscar' }}
+        </button>
+      </div>
+
+      <!-- Resumen del equipo encontrado -->
+      <div class="equipment-summary card-enter" *ngIf="equipment">
+        <div class="summary-main">
+          <div class="summary-title-row">
+            <h3 class="summary-title">{{ equipment.tipoEquipo }}</h3>
+            <span class="status-chip" [ngClass]="'status-' + equipment.estado">
+              {{ etiquetaEstado(equipment.estado) }}
+            </span>
+          </div>
+          <div class="summary-grid">
+            <div><span class="summary-label">Bien Nacional</span><span class="summary-value">{{ equipment.bienNacional }}</span></div>
+            <div><span class="summary-label">N° de serie</span><span class="summary-value">{{ equipment.numeroSerie }}</span></div>
+            <div><span class="summary-label">Ubicación</span><span class="summary-value">{{ equipment.ubicacion }}</span></div>
+            <div><span class="summary-label">Asignación</span><span class="summary-value">{{ equipment.asignacion }}</span></div>
           </div>
         </div>
+        <button mat-stroked-button type="button" class="btn-press" (click)="resetSearch()">
+          Buscar otro equipo
+        </button>
+      </div>
 
-
-
-        <!-- Campos editables -->
-        <div class="col-sm-6 col-lg-4" *ngIf="equipment">
-          <mat-form-field>
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="estado" required>
-              <mat-option value="operativo">Operativo</mat-option>
-              <mat-option value="reparacion">Reparación</mat-option>
-              <mat-option value="inoperativo">Inoperativo</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-        <div class="col-sm-6 col-lg-4" *ngIf="equipment">
-          <mat-form-field>
-            <mat-label>Ubicación</mat-label>
-            <input matInput formControlName="ubicacion" required>
-          </mat-form-field>
-        </div>
-        <div class="col-sm-6 col-lg-4" *ngIf="equipment">
-          <mat-form-field>
-            <mat-label>Asignación</mat-label>
-            <input matInput formControlName="asignacion" required>
-          </mat-form-field>
-        </div>
-
-        <!-- Motivo y Observación -->
-        <div class="col-sm-6 col-lg-4" *ngIf="equipment">
-          <mat-form-field>
-            <mat-label>Motivo</mat-label>
+      <!-- Campos editables -->
+      <div class="row card-enter" *ngIf="equipment">
+        <div class="col-sm-6 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Motivo del cambio</mat-label>
             <mat-select formControlName="motivo" required>
               <mat-option value="reubicacion">Reubicación</mat-option>
               <mat-option value="reparacion">Reparación</mat-option>
@@ -70,26 +58,54 @@
               <mat-option value="esperaPieza">Espera por Pieza</mat-option>
               <mat-option value="desincorporacion">Desincorporación</mat-option>
             </mat-select>
+            <mat-hint>El estado se ajusta automáticamente según el motivo</mat-hint>
           </mat-form-field>
         </div>
-        <div class="col-sm-6 col-lg-4" *ngIf="equipment">
-          <mat-form-field>
+        <div class="col-sm-6 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado" required>
+              <mat-option value="operativo">Operativo</mat-option>
+              <mat-option value="reparacion">Reparación</mat-option>
+              <mat-option value="inoperativo">Inoperativo</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Ubicación</mat-label>
+            <input matInput formControlName="ubicacion" required>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Asignación</mat-label>
+            <input matInput formControlName="asignacion" required>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-6 col-lg-8">
+          <mat-form-field appearance="outline">
             <mat-label>Observación</mat-label>
-            <textarea matInput formControlName="observacion" required></textarea>
+            <textarea matInput formControlName="observacion" rows="2" required
+              placeholder="Describe brevemente el cambio realizado"></textarea>
           </mat-form-field>
         </div>
-        <div class="col-sm-6 col-lg-4" *ngIf="equipment">
-          <mat-form-field>
+        <div class="col-sm-12">
+          <mat-form-field appearance="outline">
             <mat-label>Características</mat-label>
-            <textarea matInput formControlName="caracteristicas" required></textarea>
+            <textarea matInput formControlName="caracteristicas" rows="2" required></textarea>
           </mat-form-field>
         </div>
       </div>
 
-      <!-- Botones de Guardar Cambios y Restablecer Búsqueda -->
+      <!-- Acciones -->
       <div class="button-container" *ngIf="equipment">
-        <button mat-raised-button color="primary" type="submit">Guardar Cambios</button>
-        <button mat-raised-button color="warn" (click)="resetSearch()">Restablecer Búsqueda</button>
+        <button mat-stroked-button color="warn" type="button" class="btn-press" (click)="resetSearch()">
+          Cancelar
+        </button>
+        <button mat-raised-button color="primary" type="submit" class="btn-press" [disabled]="guardando">
+          {{ guardando ? 'Guardando…' : 'Guardar cambios' }}
+        </button>
       </div>
     </form>
   </mat-card-content>

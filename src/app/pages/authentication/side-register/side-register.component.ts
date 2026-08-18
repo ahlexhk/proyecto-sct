@@ -50,7 +50,6 @@ export class AppSideRegisterComponent implements OnInit {
                 Validators.pattern('^[0-9]*$'),
             ]),
             cargo: new FormControl('', [Validators.required, noWhitespace, Validators.maxLength(50)]),
-            email: new FormControl('', [Validators.required, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')]),
             password: new FormControl('', [Validators.required, noWhitespace, Validators.minLength(6)]),
         });
     }
@@ -84,13 +83,11 @@ export class AppSideRegisterComponent implements OnInit {
                 apellido: this.form.value.apellido as string,
                 dni: this.form.value.dni as string,
                 cargo: this.form.value.cargo as string,
-                email: this.form.value.email as string,
                 password: this.form.value.password as string,
             };
 
             this.authService.register(newUser).subscribe(
                 (response) => {
-                    console.log('Registro exitoso:', response);
                     this._snackBar.open('Registro exitoso. Por favor, inicia sesión.', 'Cerrar', { duration: 5000 });
                     this.router.navigate(['/authentication/login']);
                 },

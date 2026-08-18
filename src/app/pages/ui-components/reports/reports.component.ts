@@ -7,10 +7,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatTableModule } from '@angular/material/table';
-import { MatCard, MatCardModule } from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import 'jspdf-autotable';
 
 @Component({
@@ -25,7 +27,8 @@ import 'jspdf-autotable';
     MatButtonModule,
     MatDatepickerModule,
     MatTableModule,
-    MatCardModule
+    MatCardModule,
+    MatProgressSpinnerModule
   ]
 })
 export class ReportsComponent {
@@ -33,6 +36,8 @@ export class ReportsComponent {
     fechaInicio: new FormControl('', Validators.required),
     fechaFin: new FormControl('', Validators.required)
   });
+
+  cargando = false;
 
   // Datos de los reportes
   reparadosData: any = null;
@@ -43,142 +48,102 @@ export class ReportsComponent {
   // Columnas para las tablas
   displayedColumnsReparados: string[] = ['totalReparados'];
   displayedColumnsTiempoReparacion: string[] = ['tiempoPromedio'];
-  displayedColumnsReubicados: string[] = ['totalReubicados', 'ubicacionMasComun'];
+  displayedColumnsReubicados: string[] = ['equipo', 'ubicacionAnterior', 'ubicacionNueva'];
   displayedColumnsRetirosReparacion: string[] = ['ubicacion', 'totalRetiros'];
 
-
-  // Propiedad para almacenar los reportes completos
+  // Historial completo del período (usado para las descargas)
   reportesCompletos: any[] = [];
-
 
   constructor(
     private reportsService: ReportsService,
     private snackBar: MatSnackBar
-  ) {
+  ) { }
 
-   }
-
-  // Función para formatear la fecha al formato YYYY-MM-DD HH:mm:ss
+  // Formatea la fecha al formato YYYY-MM-DD HH:mm:ss
   formatDate(date: Date): string {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses van de 0 a 11
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
+
   formatDatepdf(date: Date): string {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses van de 0 a 11
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`; // Solo año, mes y día
+    return `${year}-${month}-${day}`;
+  }
+
+  // Ajusta la fecha fin al final del día para incluir el día completo
+  private rangoSeleccionado(): { inicio: string; fin: string } | null {
+    const fechaInicio = this.reportForm.get('fechaInicio')?.value;
+    const fechaFin = this.reportForm.get('fechaFin')?.value;
+    if (!fechaInicio || !fechaFin) {
+      return null;
+    }
+    const fin = new Date(fechaFin);
+    fin.setHours(23, 59, 59);
+    return {
+      inicio: this.formatDate(new Date(fechaInicio)),
+      fin: this.formatDate(fin)
+    };
   }
 
   generarReporte() {
-    if (this.reportForm.valid) {
-      const fechaInicio = this.reportForm.get('fechaInicio')?.value;
-      const fechaFin = this.reportForm.get('fechaFin')?.value;
-
-      if (!fechaInicio || !fechaFin) {
-        this.snackBar.open('Las fechas de inicio y fin son requeridas', 'Cerrar', { duration: 5000 });
-        return;
-      }
-
-      const fechaInicioFormateada = this.formatDate(new Date(fechaInicio));
-      const fechaFinFormateada = this.formatDate(new Date(fechaFin));
-
-
-      // Obtener los reportes completos
-      this.obtenerReportesCompletos(fechaInicioFormateada, fechaFinFormateada);
-
-      // Obtener el reporte de equipos reparados
-      this.reportsService.getReporteReparados(fechaInicioFormateada, fechaFinFormateada).subscribe({
-        next: (response) => {
-          if (response.mensaje === 'No se encontraron datos de equipos reparados') {
-            this.snackBar.open(response.mensaje, 'Cerrar', { duration: 5000 });
-            this.reparadosData = [];
-
-          } else {
-            this.reparadosData = [response];
-          }
-        },
-        error: (error) => {
-          this.snackBar.open('Error al obtener el reporte de reparados', 'Cerrar', { duration: 5000 });
-          this.reparadosData = [];
-        },
-      });
-
-      // Obtener el tiempo promedio de reparación
-      this.reportsService.getTiempoReparacion(fechaInicioFormateada, fechaFinFormateada).subscribe({
-        next: (response) => {
-          if (response.mensaje === 'No se encontraron datos de tiempo de reparación') {
-            this.snackBar.open(response.mensaje, 'Cerrar', { duration: 5000 });
-            this.tiempoReparacionData = [];
-          } else {
-            this.tiempoReparacionData = [response];
-          }
-        },
-        error: (error) => {
-          this.snackBar.open('Error al obtener el tiempo de reparación', 'Cerrar', { duration: 5000 });
-          this.tiempoReparacionData = [];
-        },
-      });
-
-      // Obtener el reporte de reubicados
-      this.reportsService.getReporteReubicados(fechaInicioFormateada, fechaFinFormateada).subscribe({
-        next: (response) => {
-          if (response.mensaje === 'No se encontraron datos de reubicados') {
-            this.snackBar.open(response.mensaje, 'Cerrar', { duration: 5000 });
-            this.reubicadosData = []; // Asignar un array vacío
-          } else {
-            this.reubicadosData = response; // Asignar directamente la respuesta
-          }
-        },
-        error: (error) => {
-          this.snackBar.open('Error al obtener el reporte de reubicados', 'Cerrar', { duration: 5000 });
-          this.reubicadosData = []; // Asignar un array vacío en caso de error
-        },
-      });
-
-      // Obtener el reporte de retiros para reparación
-      this.reportsService.getRetirosReparacion(fechaInicioFormateada, fechaFinFormateada).subscribe({
-        next: (response) => {
-          if (response.mensaje === 'No se encontraron datos de retiros para reparación') {
-            this.snackBar.open(response.mensaje, 'Cerrar', { duration: 5000 });
-            this.retirosReparacionData = []; // Asignar un array vacío
-          } else {
-            this.retirosReparacionData = response; // Asignar directamente la respuesta
-          }
-        },
-        error: (error) => {
-          this.snackBar.open('Error al obtener el reporte de retiros para reparación', 'Cerrar', { duration: 5000 });
-          this.retirosReparacionData = []; // Asignar un array vacío en caso de error
-        },
-      });
+    if (!this.reportForm.valid) {
+      this.snackBar.open('Las fechas de inicio y fin son requeridas', 'Cerrar', { duration: 5000 });
+      return;
     }
+    const rango = this.rangoSeleccionado();
+    if (!rango) {
+      this.snackBar.open('Las fechas de inicio y fin son requeridas', 'Cerrar', { duration: 5000 });
+      return;
+    }
+
+    this.cargando = true;
+
+    // Una sola carga coordinada: los cuatro reportes + el historial completo
+    forkJoin({
+      reparados: this.reportsService.getReporteReparados(rango.inicio, rango.fin).pipe(catchError(() => of(null))),
+      tiempoReparacion: this.reportsService.getTiempoReparacion(rango.inicio, rango.fin).pipe(catchError(() => of(null))),
+      reubicados: this.reportsService.getReporteReubicados(rango.inicio, rango.fin),
+      retiros: this.reportsService.getRetirosReparacion(rango.inicio, rango.fin),
+      completos: this.reportsService.getReportesCompletos(rango.inicio, rango.fin)
+    }).subscribe((res) => {
+      this.cargando = false;
+
+      this.reparadosData = res.reparados && !res.reparados.mensaje ? [res.reparados] : [];
+      this.tiempoReparacionData = res.tiempoReparacion && !res.tiempoReparacion.mensaje ? [res.tiempoReparacion] : [];
+      this.reubicadosData = res.reubicados && !res.reubicados.mensaje ? res.reubicados : [];
+      this.retirosReparacionData = res.retiros && !res.retiros.mensaje ? res.retiros : [];
+      this.reportesCompletos = res.completos && !res.completos.mensaje ? res.completos : [];
+
+      if (this.reportesCompletos.length === 0) {
+        this.snackBar.open('No se encontraron reportes en el período seleccionado', 'Cerrar', { duration: 5000 });
+      }
+    });
   }
 
-  async descargarPDF() {
+  descargarPDF() {
     const fechaInicio = this.reportForm.get('fechaInicio')?.value;
     const fechaFin = this.reportForm.get('fechaFin')?.value;
     if (!fechaInicio || !fechaFin) {
       this.snackBar.open('Las fechas de inicio y fin son requeridas', 'Cerrar', { duration: 5000 });
       return;
     }
-    const fechaInicioFormateada = this.formatDatepdf(new Date(fechaInicio));
-    const fechaFinFormateada = this.formatDatepdf(new Date(fechaFin));
+    const inicio = this.formatDatepdf(new Date(fechaInicio));
+    const fin = this.formatDatepdf(new Date(fechaFin));
 
+    const doc = new jsPDF('l', 'mm', 'a4');
 
-    const doc = new jsPDF('p', 'mm', 'a4');
-  
-    // Título del reporte
-    doc.setFontSize(18);
-    doc.text(`Reporte Completo ${fechaFinFormateada}  ${fechaInicioFormateada}`, 10, 20);
-  
-    // Datos para la tabla de reportes completos
+    doc.setFontSize(16);
+    doc.text(`Reporte completo — ${inicio} a ${fin}`, 10, 16);
+
     const reportesTableData = this.reportesCompletos.map((reporte, index) => [
-      index + 1, // Número de reporte
+      index + 1,
       reporte.bienNacional,
       reporte.estado_anterior,
       reporte.estado_nuevo,
@@ -186,60 +151,45 @@ export class ReportsComponent {
       reporte.ubicacion_nueva,
       reporte.motivo,
       reporte.observacion,
-      new Date(reporte.created_at).toLocaleString(), // Fecha formateada
+      reporte.registradoPor ?? '',
+      new Date(reporte.created_at).toLocaleString(),
     ]);
-  
-    // Columnas de la tabla de reportes completos
+
     const reportesTableColumns = [
-      '#',
-      'Bien Nacional',
-      'Estado Anterior',
-      'Estado Nuevo',
-      'Ubicación Anterior',
-      'Ubicación Nueva',
-      'Motivo',
-      'Observación',
-      'Fecha',
+      '#', 'Bien Nacional', 'Estado Anterior', 'Estado Nuevo',
+      'Ubicación Anterior', 'Ubicación Nueva', 'Motivo', 'Observación',
+      'Registrado por', 'Fecha',
     ];
-  
-    // Agregar la tabla de reportes completos al PDF
+
     (doc as any).autoTable({
-      head: [reportesTableColumns], // Encabezados de la tabla
-      body: reportesTableData, // Datos de la tabla
-      startY: 30, // Posición inicial de la tabla (debajo del título)
-      theme: 'grid', // Estilo de la tabla (grid, striped, plain)
-      styles: { fontSize: 10 }, // Tamaño de la fuente
-      headStyles: { fillColor: [41, 128, 185] }, // Color de fondo del encabezado
+      head: [reportesTableColumns],
+      body: reportesTableData,
+      startY: 24,
+      theme: 'grid',
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] },
     });
-  
-    // Datos para la tabla de resumen
+
     const resumenTableData = [];
-  
     if (this.reparadosData && this.reparadosData.length > 0) {
       resumenTableData.push(['Equipos Reparados', this.reparadosData[0].totalReparados]);
     }
-  
     if (this.tiempoReparacionData && this.tiempoReparacionData.length > 0) {
-      resumenTableData.push(['Tiempo Promedio de Reparación', `${this.tiempoReparacionData[0].tiempoPromedio} horas`]);
+      resumenTableData.push(['Tiempo Promedio de Reparación', `${Number(this.tiempoReparacionData[0].tiempoPromedio).toFixed(2)} horas`]);
     }
-  
-    // Columnas de la tabla de resumen
-    const resumenTableColumns = ['Resumen', 'Valor'];
-  
-    // Agregar la tabla de resumen al PDF
+
     if (resumenTableData.length > 0) {
       (doc as any).autoTable({
-        head: [resumenTableColumns], // Encabezados de la tabla
-        body: resumenTableData, // Datos de la tabla
-        startY: (doc as any).lastAutoTable.finalY + 20, // Posición inicial de la tabla (debajo de la tabla anterior)
-        theme: 'grid', // Estilo de la tabla
-        styles: { fontSize: 10 }, // Tamaño de la fuente
-        headStyles: { fillColor: [41, 128, 185] }, // Color de fondo del encabezado
+        head: [['Resumen', 'Valor']],
+        body: resumenTableData,
+        startY: (doc as any).lastAutoTable.finalY + 10,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [41, 128, 185] },
       });
     }
-  
-    // Guardar el PDF
-    doc.save(`reporte-completo_${fechaFinFormateada}_${fechaInicioFormateada}.pdf`);
+
+    doc.save(`reporte-completo_${inicio}_${fin}.pdf`);
   }
 
   descargarExcel() {
@@ -249,86 +199,52 @@ export class ReportsComponent {
       this.snackBar.open('Las fechas de inicio y fin son requeridas', 'Cerrar', { duration: 5000 });
       return;
     }
-    
-    const fechaInicioFormateada = this.formatDatepdf(new Date(fechaInicio));
-    const fechaFinFormateada = this.formatDatepdf(new Date(fechaFin));
+
+    const inicio = this.formatDatepdf(new Date(fechaInicio));
+    const fin = this.formatDatepdf(new Date(fechaFin));
 
     const wsData: any[] = [];
-  
-    // Agregar encabezados para los reportes completos
+
     wsData.push(['Reportes Completos']);
     wsData.push([
-      'Bien Nacional',
-      'Estado Anterior',
-      'Estado Nuevo',
-      'Ubicación Anterior',
-      'Ubicación Nueva',
-      'Motivo',
-      'Observación',
-      'Fecha'
+      'Bien Nacional', 'Estado Anterior', 'Estado Nuevo',
+      'Ubicación Anterior', 'Ubicación Nueva', 'Motivo',
+      'Observación', 'Registrado por', 'Fecha'
     ]);
-  
-    // Agregar los datos de los reportes completos
-    if (this.reportesCompletos.length > 0) {
-      this.reportesCompletos.forEach((reporte) => {
-        wsData.push([
-          reporte.bienNacional,
-          reporte.estado_anterior,
-          reporte.estado_nuevo,
-          reporte.ubicacion_anterior,
-          reporte.ubicacion_nueva,
-          reporte.motivo,
-          reporte.observacion,
-          new Date(reporte.created_at).toLocaleString()
-        ]);
-      });
-    }
-  
-    // Espacio en blanco entre secciones
+
+    this.reportesCompletos.forEach((reporte) => {
+      wsData.push([
+        reporte.bienNacional,
+        reporte.estado_anterior,
+        reporte.estado_nuevo,
+        reporte.ubicacion_anterior,
+        reporte.ubicacion_nueva,
+        reporte.motivo,
+        reporte.observacion,
+        reporte.registradoPor ?? '',
+        new Date(reporte.created_at).toLocaleString()
+      ]);
+    });
+
     wsData.push([]);
-  
-    // Agregar los datos de resumen (reparados, tiempoReparacion, etc.)
+
     if (this.reparadosData && this.reparadosData.length > 0) {
       wsData.push(['Resumen de Equipos Reparados']);
       wsData.push(['Total Reparados']);
       wsData.push([this.reparadosData[0].totalReparados]);
-      wsData.push([]); // Espacio en blanco
+      wsData.push([]);
     }
-  
+
     if (this.tiempoReparacionData && this.tiempoReparacionData.length > 0) {
       wsData.push(['Resumen de Tiempo Promedio de Reparación']);
       wsData.push(['Tiempo Promedio (horas)']);
       wsData.push([this.tiempoReparacionData[0].tiempoPromedio]);
-      wsData.push([]); // Espacio en blanco
+      wsData.push([]);
     }
-  
-    // Crear la hoja de trabajo
+
     const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(wsData);
-  
-    // Crear el libro de trabajo
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-  
-    // Escribir el archivo y descargarlo
-    XLSX.writeFile(wb, `reporte-completo_${fechaFinFormateada}_${fechaInicioFormateada}.xlsx`);
+    XLSX.writeFile(wb, `reporte-completo_${inicio}_${fin}.xlsx`);
   }
-
-  // Método para obtener los reportes completos
-  obtenerReportesCompletos(fechaInicio: string, fechaFin: string) {
-    this.reportsService.getReportesCompletos(fechaInicio, fechaFin).subscribe({
-      next: (response) => {
-        if (response.mensaje) {
-          this.snackBar.open(response.mensaje, 'Cerrar', { duration: 5000 });
-          this.reportesCompletos = [];
-        } else {
-          this.reportesCompletos = response;
-        }
-      },
-      error: (error) => {
-        this.snackBar.open('Error al obtener los reportes completos', 'Cerrar', { duration: 5000 });
-        this.reportesCompletos = [];
-      },
-    });
-  }
-
 }

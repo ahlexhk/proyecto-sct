@@ -6,7 +6,19 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { EquipmentService } from '../../services/equipment.service';
+import { Equipment, EquipmentService } from '../../services/equipment.service';
+
+const ETIQUETAS: Record<string, string> = {
+  reubicacion: 'Reubicación',
+  reparacion: 'Reparación',
+  reasignacion: 'Reasignación',
+  entrega: 'Entrega',
+  esperaEntrega: 'Espera por Entrega',
+  esperaPieza: 'Espera por Pieza',
+  desincorporacion: 'Desincorporación',
+  inoperativo: 'Inoperativo',
+  operativo: 'Operativo',
+};
 
 @Component({
   selector: 'app-starter',
@@ -25,73 +37,43 @@ import { EquipmentService } from '../../services/equipment.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class StarterComponent {
-  bienNacional: string = ''; // Campo para almacenar el Bien Nacional ingresado
-  equipoEncontrado: any = null; // Objeto para almacenar el equipo encontrado
-  error: string = ''; // Mensaje de error
+  bienNacional: string = '';
+  equipoEncontrado: Equipment | null = null;
+  error: string = '';
+  buscando = false;
 
   constructor(private equipmentService: EquipmentService) { }
 
-  // Método para buscar el equipo
   buscarEquipo() {
-    this.equipoEncontrado = null; // Reiniciar el equipo encontrado
-    this.error = ''; // Reiniciar el mensaje de error
+    this.equipoEncontrado = null;
+    this.error = '';
 
-    if (!this.bienNacional) {
+    if (!this.bienNacional || !this.bienNacional.trim()) {
       this.error = 'Por favor, ingrese un Bien Nacional válido.';
       return;
     }
 
-    // Usar el servicio para buscar el equipo
-    this.equipmentService.getEquipmentByBienNacional(this.bienNacional).subscribe(
-      (data: any) => {
-        if (data) {
-          this.equipoEncontrado = data; // Asignar el equipo encontrado
-          console.log('Datos recibidos del backend:', data); // Verificar los datos
-          console.log('Estado formateado:', this.formatearMotivo(data.estado)); // Verificar el formateo del estado
-          console.log('Último motivo formateado:', this.formatearMotivo(data.ultimoMotivo)); // Verificar el formateo del último motivo
-        } else {
-          this.error = 'No se encontró ningún equipo con el Bien Nacional proporcionado.';
-        }
+    this.buscando = true;
+    this.equipmentService.getEquipmentByBienNacional(this.bienNacional).subscribe({
+      next: (data) => {
+        this.buscando = false;
+        this.equipoEncontrado = data;
       },
-      (error) => {
-        if (error.status === 404) {
-          this.error = 'Equipo no encontrado.';
-        } else if (error.status === 0) {
-          this.error = 'No se pudo conectar al servidor. Por favor, intente nuevamente más tarde.';
-        } else {
-          this.error = 'Error al buscar el equipo. Por favor, intente nuevamente.';
-        }
+      error: (error) => {
+        this.buscando = false;
+        this.error = error.message ?? 'Error al buscar el equipo. Por favor, intente nuevamente.';
       }
-    );
+    });
   }
 
-  // Método para formatear el motivo
-  formatearMotivo(motivo: string): string {
-    switch (motivo) {
-      case 'reubicacion':
-        return 'Reubicación';
-      case 'reparacion':
-        return 'Reparación';
-      case 'reasignacion':
-        return 'Reasignación';
-      case 'entrega':
-        return 'Entrega';
-      case 'esperaEntrega':
-        return 'Espera por Entrega';
-      case 'esperaPieza':
-        return 'Espera por Pieza';
-      case 'desincorporacion':
-        return 'Desincorporación';
-      case 'inoperativo':
-        return 'Inoperativo';
-      case 'operativo':
-        return 'Operativo';
-      default:
-        return motivo; // Si no coincide con ningún caso, devolver el valor original
+  formatearMotivo(motivo: string | null | undefined): string {
+    if (!motivo) {
+      return '—';
     }
+    return ETIQUETAS[motivo] ?? motivo;
   }
 
-  onKeyPress = (event: any) => {
+  onKeyPress = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       this.buscarEquipo();
     }

@@ -1,57 +1,86 @@
+.dashboard-subtitle {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
 .search-container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-  
-    mat-form-field {
-      flex: 1;
-    }
-  
-    button {
-      height: 56px; // Ajustar altura para que coincida con el campo de búsqueda
-    }
-  }
-  
-  .result-container {
-    margin-top: 24px;
-  
-    mat-card {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 16px;
-  
-      mat-card-header {
-        background-color: #f5f5f5;
-        padding: 16px;
-        border-bottom: 1px solid #ddd;
-      }
-  
-      mat-card-content {
-        padding: 16px;
-  
-        p {
-          margin: 8px 0;
-        }
-      }
-    }
-  }
-  
-  .error-message {
-    margin-top: 24px;
-  
-    mat-card {
-      background-color: #ffebee; // Fondo rojo claro para errores
-      padding: 16px;
-  
-      .error-text {
-        color: #d32f2f; // Texto rojo
-        margin: 0;
-      }
-    }
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  mat-form-field {
+    flex: 1;
   }
 
+  .button-search {
+    margin-top: 6px;
+    height: 48px;
+  }
+}
 
-.button-search{
-  margin-bottom: 21px;
+.result-container {
+  margin-top: 8px;
+
+  mat-card {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 8px;
+    border-radius: 12px;
+  }
+}
+
+.result-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.result-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 24px;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-label {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.02em;
+}
+
+.result-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.m-t-12 {
+  margin-top: 12px;
+}
+
+.error-message {
+  margin-top: 24px;
+
+  mat-card {
+    background-color: #ffebee;
+    padding: 16px;
+
+    .error-text {
+      color: #d32f2f;
+      margin: 0;
+    }
+  }
 }

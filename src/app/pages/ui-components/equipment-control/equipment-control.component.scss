@@ -1,82 +1,127 @@
 .cardWithShadow {
-    margin: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.section-subtitle {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -8px;
+}
+
+.col-sm-6, .col-lg-4, .col-lg-8, .col-sm-12 {
+  padding: 8px;
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 600px) {
+  .col-sm-6 {
+    flex: 1 1 50%;
+    max-width: 50%;
   }
-  
-  .theme-card {
-    background-color: #ffffff;
-    border-radius: 8px;
+}
+
+@media (min-width: 960px) {
+  .col-lg-4 {
+    flex: 1 1 33.333%;
+    max-width: 33.333%;
   }
-  
-  .mat-form-field {
-    width: 100%;
-    margin-bottom: 16px;
+  .col-lg-8 {
+    flex: 1 1 66.666%;
+    max-width: 66.666%;
   }
-  
-  button[mat-raised-button] {
-    margin-top: 16px;
+}
+
+.search-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  .search-field {
+    flex: 1;
   }
 
-  .cardWithShadow {
-    margin: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .theme-card {
-    background-color: #ffffff;
-    border-radius: 8px;
-  }
-  
-  .mat-form-field {
-    width: 100%;
-    margin-bottom: 16px;
-  }
-  
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    margin: -8px;
-  }
-  
-  .col-sm-6, .col-lg-4 {
-    padding: 8px;
-    flex: 1 1 100%;
-    max-width: 100%;
-  }
-  
-  @media (min-width: 600px) {
-    .col-sm-6 {
-      flex: 1 1 50%;
-      max-width: 50%;
-    }
-  }
-  
-  @media (min-width: 960px) {
-    .col-lg-4 {
-      flex: 1 1 33.333%;
-      max-width: 33.333%;
-    }
-  }
-  
-  .search-container {
-    display: flex;
-    align-items: flex-end; /* Alinea el botón con el campo */
-    gap: 16px; /* Espacio entre el campo y el botón */
-  }
-  
-  .search-field {
-    flex: 1; /* El campo ocupa el espacio disponible */
-  }
-  
   .search-button {
-    margin-bottom: 16px; /* Ajusta el margen inferior para alinearlo con el campo */
+    margin-top: 6px;
+    height: 48px;
   }
-  
-  .button-container {
+}
+
+// Resumen del equipo encontrado
+.equipment-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.summary-main {
+  flex: 1;
+  min-width: 240px;
+}
+
+.summary-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.summary-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px 24px;
+
+  > div {
     display: flex;
-    justify-content: flex-end; /* Alinea los botones a la derecha */
-    gap: 16px; /* Espacio entre los botones */
-    margin-top: 24px; /* Espacio superior */
+    flex-direction: column;
   }
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.02em;
+}
+
+.summary-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}

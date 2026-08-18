@@ -2,3 +2,106 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ============================================================
+   Fundamentos de interacción (apple-design)
+   - feedback instantáneo en el press, no en el release
+   - animaciones cortas que parten del valor actual
+   - respeto por prefers-reduced-motion
+   ============================================================ */
+
+/* Feedback inmediato al presionar cualquier botón de Material */
+.btn-press {
+  transition: transform 100ms ease-out, box-shadow 150ms ease-out;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-icon-button {
+  transition: transform 100ms ease-out;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Entrada suave de páginas y bloques: corta, sin rebote (critically damped) */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 280ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.card-enter {
+  animation: page-enter 240ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* Tipografía: tracking negativo en títulos grandes, cuerpo neutro */
+.heading-display {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+/* Chips de estado del inventario */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.status-operativo {
+  background: rgba(46, 160, 67, 0.12);
+  color: #1a7f37;
+}
+
+.status-reparacion {
+  background: rgba(255, 170, 0, 0.15);
+  color: #9a6700;
+}
+
+.status-inoperativo {
+  background: rgba(207, 34, 46, 0.12);
+  color: #cf222e;
+}
+
+/* Foco visible para navegación por teclado */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #1e88e5;
+  outline-offset: 2px;
+}
+
+/* Accesibilidad: sin desplazamientos para quienes reducen el movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .page-enter,
+  .card-enter {
+    animation: none;
+  }
+}

@@ -1,37 +1,67 @@
-<mat-card class="cardWithShadow theme-card">
+<mat-card class="cardWithShadow theme-card page-enter">
   <mat-card-header>
-    <mat-card-title class="m-b-0">Dashboard</mat-card-title>
+    <div>
+      <mat-card-title class="m-b-0 heading-display">Consulta de equipos</mat-card-title>
+      <mat-card-subtitle class="dashboard-subtitle">
+        Ingresa el Bien Nacional para ver el estado y la ubicación actual del equipo
+      </mat-card-subtitle>
+    </div>
   </mat-card-header>
   <mat-card-content class="b-t-1">
     <div class="search-container">
       <mat-form-field appearance="outline">
         <mat-label>Buscar por Bien Nacional</mat-label>
-        <input matInput [(ngModel)]="bienNacional" placeholder="Ingrese el Bien Nacional" (keydown)="onKeyPress($event)" />
+        <input matInput [(ngModel)]="bienNacional" placeholder="Ingrese el Bien Nacional"
+          autocomplete="off" (keydown)="onKeyPress($event)" />
       </mat-form-field>
-      <button mat-raised-button color="primary" (click)="buscarEquipo()" class="button-search">Buscar</button>
+      <button mat-raised-button color="primary" (click)="buscarEquipo()" class="button-search btn-press"
+        [disabled]="buscando">
+        {{ buscando ? 'Buscando…' : 'Buscar' }}
+      </button>
     </div>
 
-    <div *ngIf="equipoEncontrado" class="result-container">
+    <div *ngIf="equipoEncontrado" class="result-container card-enter">
       <mat-card class="b-1 shadow-none">
-        <mat-card-header>
-          <mat-card-title>Información del Equipo</mat-card-title>
-        </mat-card-header>
         <mat-card-content>
-          <p><strong>Bien Nacional:</strong> {{ equipoEncontrado.bienNacional }}</p>
-          <p><strong>Tipo de Equipo:</strong> {{ equipoEncontrado.tipoEquipo }}</p>
-          <p><strong>Número de Serie:</strong> {{ equipoEncontrado.numeroSerie }}</p>
-          <p><strong>Estado:</strong> {{ formatearMotivo(equipoEncontrado.estado) }}</p>
-          <p><strong>Ubicación:</strong> {{ equipoEncontrado.ubicacion }}</p>
-          <p><strong>Asignación:</strong> {{ equipoEncontrado.asignacion }}</p>
-          <p *ngIf="equipoEncontrado.ultimoMotivo">
-            <strong>Detalles:</strong> {{ formatearMotivo(equipoEncontrado.ultimoMotivo) }}
-          </p>
-          <p><strong>Características:</strong> {{ equipoEncontrado.caracteristicas }}</p>
+          <div class="result-title-row">
+            <h3 class="result-title">{{ equipoEncontrado.tipoEquipo }}</h3>
+            <span class="status-chip" [ngClass]="'status-' + equipoEncontrado.estado">
+              {{ formatearMotivo(equipoEncontrado.estado) }}
+            </span>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-item">
+              <span class="result-label">Bien Nacional</span>
+              <span class="result-value">{{ equipoEncontrado.bienNacional }}</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Número de Serie</span>
+              <span class="result-value">{{ equipoEncontrado.numeroSerie }}</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Ubicación</span>
+              <span class="result-value">{{ equipoEncontrado.ubicacion }}</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">Asignación</span>
+              <span class="result-value">{{ equipoEncontrado.asignacion }}</span>
+            </div>
+            <div class="result-item" *ngIf="equipoEncontrado.ultimoMotivo">
+              <span class="result-label">Último movimiento</span>
+              <span class="result-value">{{ formatearMotivo(equipoEncontrado.ultimoMotivo) }}</span>
+            </div>
+          </div>
+
+          <div class="result-item m-t-12">
+            <span class="result-label">Características</span>
+            <span class="result-value">{{ equipoEncontrado.caracteristicas }}</span>
+          </div>
         </mat-card-content>
       </mat-card>
     </div>
 
-    <div *ngIf="error" class="error-message">
+    <div *ngIf="error" class="error-message card-enter">
       <mat-card>
         <mat-card-content>
           <p class="error-text">{{ error }}</p>
