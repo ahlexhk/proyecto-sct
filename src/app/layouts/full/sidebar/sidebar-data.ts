@@ -35,6 +35,12 @@ export const navItems: NavItem[] = [
     route: '/ui-components/control',
   },
   {
+    displayName: 'Puestos de trabajo',
+    iconName: 'device-desktop',
+    bgcolor: 'primary',
+    route: '/ui-components/workstations',
+  },
+  {
     displayName: 'Reportes',
     iconName: 'report-analytics',
     bgcolor: 'primary',

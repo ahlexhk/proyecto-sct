@@ -14,6 +14,7 @@ export interface Equipment {
   asignacion: string;
   caracteristicas: string;
   ultimoMotivo?: string | null;
+  puesto?: string | null; // nombre del puesto de trabajo al que pertenece
 }
 
 @Injectable({

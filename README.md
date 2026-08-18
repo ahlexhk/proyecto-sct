@@ -7,7 +7,8 @@ Aplicación Angular 18 (Material + plantilla Spike) para la gestión de soporte 
 - **Hoja de vida del equipo**: al buscar por Bien Nacional con sesión activa se muestra el historial de movimientos de inventario y las incidencias de soporte del equipo.
 - **Notificaciones**: campana en el encabezado que avisa (sondeo cada 30 s) cuando entra una nueva solicitud de soporte o cambia una incidencia.
 - **Consulta de equipos** (dashboard): búsqueda pública por Bien Nacional con estado, ubicación y último movimiento.
-- **Registro de equipos por tipo**: cada producto (PC, monitor, teclado, mouse, cornetas, impresora…) se registra con su propio Bien Nacional; las PCs y laptops llevan especificaciones estructuradas (procesador, RAM, almacenamiento, SO).
+- **Registro de equipos por tipo**: cada producto (PC, monitor, teclado, mouse, cornetas, impresora…) se registra con su propio Bien Nacional; las PCs y laptops llevan especificaciones estructuradas (procesador, RAM, almacenamiento, SO). El formulario avisa en vivo si el Bien Nacional ya está registrado.
+- **Puestos de trabajo**: agrupan varios equipos vinculados por su Bien Nacional (la PC con su monitor, teclado, mouse…), con responsable y ubicación; la vinculación valida en vivo contra el inventario y avisa si el equipo ya pertenece a otro puesto (con opción de moverlo).
 - **Correo**: si el backend tiene SMTP configurado, los técnicos reciben un email al entrar una solicitud y el solicitante otro cuando su incidencia queda resuelta (el correo se pide opcionalmente en el registro de usuario).
 - **Registro de equipos**: alta de equipos en el inventario (requiere sesión).
 - **Control de equipos**: cambios de estado/ubicación/asignación con motivo y observación; cada cambio queda registrado como reporte (requiere sesión).

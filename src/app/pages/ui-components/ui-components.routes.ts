@@ -6,6 +6,7 @@ import { ReportsComponent } from './reports/reports.component';
 import { AppEquipmentComponent } from './equipment/equipment.component';
 import { EquipmentControlComponent } from './equipment-control/equipment-control.component';
 import { IncidentsComponent } from './incidents/incidents.component';
+import { WorkstationsComponent } from './workstations/workstations.component';
 
 export const UiComponentsRoutes: Routes = [
   {
@@ -15,6 +16,10 @@ export const UiComponentsRoutes: Routes = [
       {
         path: 'incidents',
         component: IncidentsComponent,
+      },
+      {
+        path: 'workstations',
+        component: WorkstationsComponent,
       },
       {
         path: 'reports',

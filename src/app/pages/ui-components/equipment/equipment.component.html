@@ -14,6 +14,13 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Bien Nacional</mat-label>
                         <input matInput formControlName="bienNacional" type="text" autocomplete="off">
+                        @if (verificandoBn) {
+                            <mat-hint>Verificando…</mat-hint>
+                        } @else if (bnDuplicado) {
+                            <mat-hint class="hint-error">✗ {{ bnDuplicado }}</mat-hint>
+                        } @else if (equipmentForm.controls.bienNacional.value?.trim()) {
+                            <mat-hint class="hint-ok">✓ Bien Nacional disponible</mat-hint>
+                        }
                         @if (equipmentForm.controls.bienNacional.touched && equipmentForm.controls.bienNacional.hasError('required')) {
                             <mat-error>El Bien Nacional es requerido</mat-error>
                         }

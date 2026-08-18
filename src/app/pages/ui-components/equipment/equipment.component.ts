@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EquipmentService } from 'src/app/services/equipment.service';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // Todos los productos del inventario llevan su propio Bien Nacional:
 // la PC, el monitor, el teclado, el mouse, las cornetas, la impresora…
@@ -52,6 +53,10 @@ export class AppEquipmentComponent {
   guardando = false;
   tiposEquipo = TIPOS_EQUIPO;
 
+  // Aviso en vivo si el Bien Nacional ya está registrado
+  bnDuplicado: string | null = null;
+  verificandoBn = false;
+
   equipmentForm = new FormGroup({
     bienNacional: new FormControl('', [Validators.required, Validators.maxLength(255)]),
     tipoEquipo: new FormControl('', Validators.required),
@@ -75,6 +80,32 @@ export class AppEquipmentComponent {
     // El campo "Otro" y las especificaciones cambian según el tipo elegido
     this.equipmentForm.get('tipoEquipo')?.valueChanges.subscribe(() => {
       this.equipmentForm.get('tipoEquipoOtro')?.setValue('');
+    });
+
+    // Aviso en vivo: mientras se escribe el BN se comprueba si ya existe
+    // en el inventario, antes de intentar guardar.
+    this.equipmentForm.get('bienNacional')?.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((valor) => this.verificarBnDuplicado((valor ?? '').trim()));
+  }
+
+  private verificarBnDuplicado(bn: string): void {
+    this.bnDuplicado = null;
+    if (!bn) {
+      this.verificandoBn = false;
+      return;
+    }
+    this.verificandoBn = true;
+    this.equipmentService.getEquipmentByBienNacional(bn).subscribe({
+      next: (equipo) => {
+        this.verificandoBn = false;
+        this.bnDuplicado = `Ya está registrado como "${equipo.tipoEquipo}" en ${equipo.ubicacion}`;
+      },
+      error: () => {
+        // No existe: el BN está libre
+        this.verificandoBn = false;
+        this.bnDuplicado = null;
+      }
     });
   }
 
@@ -107,6 +138,10 @@ export class AppEquipmentComponent {
     if (this.equipmentForm.invalid) {
       this.equipmentForm.markAllAsTouched();
       this.snackBar.open('Por favor, completa todos los campos requeridos', 'Cerrar', { duration: 5000 });
+      return;
+    }
+    if (this.bnDuplicado) {
+      this.snackBar.open('Ese Bien Nacional ya está registrado en el inventario', 'Cerrar', { duration: 5000 });
       return;
     }
 

@@ -1,0 +1,149 @@
+<mat-card class="cardWithShadow theme-card page-enter">
+  <mat-card-header>
+    <div class="header-row">
+      <div>
+        <mat-card-title class="m-b-0 heading-display">Puestos de trabajo</mat-card-title>
+        <mat-card-subtitle class="section-subtitle">
+          Agrupa los equipos de un mismo puesto (PC, monitor, teclado, mouse…) vinculándolos por su Bien Nacional
+        </mat-card-subtitle>
+      </div>
+      <button mat-raised-button color="primary" class="btn-press" (click)="toggleFormulario()">
+        {{ mostrandoFormulario ? 'Cancelar' : '+ Nuevo puesto' }}
+      </button>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content class="b-t-1">
+
+    <!-- Alta de puesto -->
+    <div class="form-card card-enter" *ngIf="mostrandoFormulario">
+      <form [formGroup]="puestoForm" (ngSubmit)="crearPuesto()">
+        <div class="row">
+          <div class="col-sm-6 col-lg-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre del puesto</mat-label>
+              <input matInput formControlName="nombre" placeholder="Ej: Recepción 1" autocomplete="off">
+              @if (puestoForm.controls.nombre.touched && puestoForm.controls.nombre.hasError('required')) {
+                <mat-error>El nombre es requerido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="col-sm-6 col-lg-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Ubicación</mat-label>
+              <input matInput formControlName="ubicacion" placeholder="Ej: Planta baja">
+              @if (puestoForm.controls.ubicacion.touched && puestoForm.controls.ubicacion.hasError('required')) {
+                <mat-error>La ubicación es requerida</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="col-sm-6 col-lg-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Responsable</mat-label>
+              <input matInput formControlName="responsable" placeholder="Persona a cargo del puesto">
+              @if (puestoForm.controls.responsable.touched && puestoForm.controls.responsable.hasError('required')) {
+                <mat-error>El responsable es requerido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="col-sm-12">
+            <mat-form-field appearance="outline">
+              <mat-label>Descripción (opcional)</mat-label>
+              <input matInput formControlName="descripcion">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" class="btn-press" [disabled]="guardando">
+            {{ guardando ? 'Creando…' : 'Crear puesto' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Cargando -->
+    <div class="loading-row" *ngIf="cargando">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Cargando puestos…</span>
+    </div>
+
+    <!-- Vacío -->
+    <div class="empty-state card-enter" *ngIf="!cargando && puestos.length === 0">
+      <p class="empty-title">Aún no hay puestos de trabajo</p>
+      <p class="empty-hint">Crea un puesto y vincula los equipos que lo componen por su Bien Nacional.</p>
+    </div>
+
+    <!-- Lista de puestos -->
+    <div class="puesto-list" *ngIf="!cargando">
+      <div class="puesto-card card-enter" *ngFor="let puesto of puestos" [class.selected]="expandido === puesto.id">
+
+        <button type="button" class="puesto-summary" (click)="toggleExpandir(puesto)">
+          <div class="puesto-main">
+            <div class="puesto-title-row">
+              <span class="puesto-name">{{ puesto.nombre }}</span>
+              <span class="equipos-badge">{{ puesto.equipos.length }} equipo{{ puesto.equipos.length === 1 ? '' : 's' }}</span>
+            </div>
+            <div class="puesto-meta">
+              {{ puesto.ubicacion }} · Responsable: {{ puesto.responsable }}
+              <span *ngIf="puesto.descripcion"> · {{ puesto.descripcion }}</span>
+            </div>
+            <!-- Chips resumen de los equipos -->
+            <div class="equipo-chips" *ngIf="puesto.equipos.length > 0">
+              <span class="equipo-chip" *ngFor="let e of puesto.equipos" [ngClass]="'chip-' + e.estado"
+                [title]="etiquetaEstado(e.estado)">
+                {{ e.tipoEquipo }} · {{ e.bienNacional }}
+              </span>
+            </div>
+          </div>
+          <span class="chevron" [class.open]="expandido === puesto.id">›</span>
+        </button>
+
+        <!-- Detalle: gestión de equipos del puesto -->
+        <div class="puesto-detail card-enter" *ngIf="expandido === puesto.id">
+
+          <div class="equipos-tabla" *ngIf="puesto.equipos.length > 0">
+            <div class="equipo-row" *ngFor="let e of puesto.equipos">
+              <span class="equipo-tipo">{{ e.tipoEquipo }}</span>
+              <span class="equipo-bn">{{ e.bienNacional }}</span>
+              <span class="status-chip" [ngClass]="'status-' + e.estado">{{ etiquetaEstado(e.estado) }}</span>
+              <button mat-button color="warn" type="button" class="btn-press" (click)="desvincular(puesto, e.id)">
+                Desvincular
+              </button>
+            </div>
+          </div>
+          <p class="empty-hint" *ngIf="puesto.equipos.length === 0">Este puesto aún no tiene equipos vinculados.</p>
+
+          <!-- Vincular equipo con validación en vivo -->
+          <div class="link-row">
+            <mat-form-field appearance="outline" class="link-field">
+              <mat-label>Vincular equipo por Bien Nacional</mat-label>
+              <input matInput [formControl]="bnControl" autocomplete="off"
+                (keydown.enter)="$event.preventDefault(); vincular(puesto)">
+              @switch (validacionBn.tipo) {
+                @case ('verificando') {
+                  <mat-hint>Verificando en el inventario…</mat-hint>
+                }
+                @case ('valido') {
+                  <mat-hint class="hint-ok">✓ {{ validacionBn.detalle }}</mat-hint>
+                }
+                @case ('invalido') {
+                  <mat-hint class="hint-error">✗ {{ validacionBn.detalle }}</mat-hint>
+                }
+              }
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="button" class="btn-press"
+              (click)="vincular(puesto)" [disabled]="vinculando || validacionBn.tipo === 'verificando'">
+              {{ vinculando ? 'Vinculando…' : 'Vincular' }}
+            </button>
+          </div>
+
+          <div class="danger-row">
+            <button mat-stroked-button color="warn" type="button" class="btn-press" (click)="eliminarPuesto(puesto)">
+              Eliminar puesto
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
