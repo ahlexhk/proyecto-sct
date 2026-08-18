@@ -57,6 +57,13 @@
                         </mat-select>
                       </mat-form-field>
 
+                      <!-- Email (opcional, para notificaciones) -->
+                      <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Correo (opcional, para avisos de incidencias)</mat-label>
+                      <mat-form-field appearance="outline" class="w-100" color="primary">
+                        <input matInput formControlName="email" type="email" placeholder="tecnico@ejemplo.com" />
+                        <app-error-messages [control]="f['email']"></app-error-messages>
+                      </mat-form-field>
+
                       <!-- Contraseña -->
                       <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Contraseña</mat-label>
                       <mat-form-field appearance="outline" class="w-100" color="primary">

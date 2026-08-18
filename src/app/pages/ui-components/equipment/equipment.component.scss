@@ -13,3 +13,40 @@ mat-form-field {
   justify-content: flex-end;
   margin-top: 8px;
 }
+
+.specs-block {
+  padding: 12px 16px 0;
+  margin: 4px 0 12px;
+  border-radius: 12px;
+  background: rgba(30, 136, 229, 0.04);
+  border: 1px solid rgba(30, 136, 229, 0.15);
+}
+
+.specs-title {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #1565c0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -8px;
+}
+
+.col-sm-6, .col-lg-3, .col-lg-4, .col-sm-12 {
+  padding: 8px;
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 600px) {
+  .col-sm-6 { flex: 1 1 50%; max-width: 50%; }
+}
+
+@media (min-width: 960px) {
+  .col-lg-4 { flex: 1 1 33.333%; max-width: 33.333%; }
+  .col-lg-3 { flex: 1 1 25%; max-width: 25%; }
+}
