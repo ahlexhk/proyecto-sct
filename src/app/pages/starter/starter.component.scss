@@ -21,6 +21,17 @@
   margin-bottom: 24px;
 }
 
+@media (max-width: 599px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.4rem;
+  }
+}
+
 .stat-card {
   display: flex;
   flex-direction: column;
@@ -157,6 +168,53 @@
 .priority-media { background: rgba(30, 136, 229, 0.1); color: #1565c0; }
 .priority-alta { background: rgba(255, 170, 0, 0.15); color: #9a6700; }
 .priority-critica { background: rgba(207, 34, 46, 0.12); color: #cf222e; }
+
+/* ---------- Hoja de vida del equipo ---------- */
+.history-section {
+  margin-top: 20px;
+}
+
+.history-empty {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 4px 0 8px;
+}
+
+.history-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+
+  th, td {
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  th {
+    background: rgba(0, 0, 0, 0.03);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.m-t-16 {
+  margin-top: 16px;
+}
 
 .incident-status-abierta { background: rgba(207, 34, 46, 0.1); color: #cf222e; }
 .incident-status-en_proceso { background: rgba(30, 136, 229, 0.12); color: #1565c0; }

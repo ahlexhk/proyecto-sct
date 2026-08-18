@@ -54,6 +54,11 @@ export class ReportsComponent {
   // Historial completo del período (usado para las descargas)
   reportesCompletos: any[] = [];
 
+  // Reporte de soporte técnico
+  soporteData: any = null;
+  displayedColumnsTecnico: string[] = ['tecnico', 'asignadas', 'resueltas', 'tiempoPromedioHoras'];
+  displayedColumnsUbicacion: string[] = ['ubicacion', 'total', 'urgentes'];
+
   constructor(
     private reportsService: ReportsService,
     private snackBar: MatSnackBar
@@ -111,7 +116,8 @@ export class ReportsComponent {
       tiempoReparacion: this.reportsService.getTiempoReparacion(rango.inicio, rango.fin).pipe(catchError(() => of(null))),
       reubicados: this.reportsService.getReporteReubicados(rango.inicio, rango.fin),
       retiros: this.reportsService.getRetirosReparacion(rango.inicio, rango.fin),
-      completos: this.reportsService.getReportesCompletos(rango.inicio, rango.fin)
+      completos: this.reportsService.getReportesCompletos(rango.inicio, rango.fin),
+      soporte: this.reportsService.getReporteSoporte(rango.inicio, rango.fin).pipe(catchError(() => of(null)))
     }).subscribe((res) => {
       this.cargando = false;
 
@@ -120,6 +126,7 @@ export class ReportsComponent {
       this.reubicadosData = res.reubicados && !res.reubicados.mensaje ? res.reubicados : [];
       this.retirosReparacionData = res.retiros && !res.retiros.mensaje ? res.retiros : [];
       this.reportesCompletos = res.completos && !res.completos.mensaje ? res.completos : [];
+      this.soporteData = res.soporte;
 
       if (this.reportesCompletos.length === 0) {
         this.snackBar.open('No se encontraron reportes en el período seleccionado', 'Cerrar', { duration: 5000 });
@@ -177,11 +184,47 @@ export class ReportsComponent {
     if (this.tiempoReparacionData && this.tiempoReparacionData.length > 0) {
       resumenTableData.push(['Tiempo Promedio de Reparación', `${Number(this.tiempoReparacionData[0].tiempoPromedio).toFixed(2)} horas`]);
     }
+    if (this.soporteData?.totales) {
+      const t = this.soporteData.totales;
+      resumenTableData.push(['Incidencias de soporte creadas', t.creadas]);
+      resumenTableData.push(['Incidencias resueltas/cerradas', t.resueltas]);
+      if (t.tiempoRespuestaMinutos) {
+        resumenTableData.push(['Tiempo prom. de respuesta', `${Number(t.tiempoRespuestaMinutos).toFixed(0)} min`]);
+      }
+      if (t.tiempoResolucionHoras) {
+        resumenTableData.push(['Tiempo prom. de resolución', `${Number(t.tiempoResolucionHoras).toFixed(1)} horas`]);
+      }
+    }
 
     if (resumenTableData.length > 0) {
       (doc as any).autoTable({
         head: [['Resumen', 'Valor']],
         body: resumenTableData,
+        startY: (doc as any).lastAutoTable.finalY + 10,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [41, 128, 185] },
+      });
+    }
+
+    // Soporte técnico: incidencias por técnico y por ubicación
+    if (this.soporteData?.porTecnico?.length > 0) {
+      (doc as any).autoTable({
+        head: [['Técnico', 'Asignadas', 'Resueltas', 'Tiempo prom. (h)']],
+        body: this.soporteData.porTecnico.map((t: any) => [
+          t.tecnico, t.asignadas, t.resueltas,
+          t.tiempoPromedioHoras ? Number(t.tiempoPromedioHoras).toFixed(1) : '—'
+        ]),
+        startY: (doc as any).lastAutoTable.finalY + 10,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [41, 128, 185] },
+      });
+    }
+    if (this.soporteData?.porUbicacion?.length > 0) {
+      (doc as any).autoTable({
+        head: [['Ubicación', 'Incidencias', 'Urgentes (alta/crítica)']],
+        body: this.soporteData.porUbicacion.map((u: any) => [u.ubicacion, u.total, u.urgentes]),
         startY: (doc as any).lastAutoTable.finalY + 10,
         theme: 'grid',
         styles: { fontSize: 9 },

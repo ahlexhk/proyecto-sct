@@ -50,6 +50,7 @@ export class AppSideRegisterComponent implements OnInit {
                 Validators.pattern('^[0-9]*$'),
             ]),
             cargo: new FormControl('', [Validators.required, noWhitespace, Validators.maxLength(50)]),
+            rol: new FormControl('operador', [Validators.required]),
             password: new FormControl('', [Validators.required, noWhitespace, Validators.minLength(6)]),
         });
     }
@@ -83,6 +84,7 @@ export class AppSideRegisterComponent implements OnInit {
                 apellido: this.form.value.apellido as string,
                 dni: this.form.value.dni as string,
                 cargo: this.form.value.cargo as string,
+                rol: this.form.value.rol as string,
                 password: this.form.value.password as string,
             };
 

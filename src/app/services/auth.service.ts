@@ -7,15 +7,18 @@ import { environment } from 'src/environments/environment';
 
 const apiUrl = `${environment.apiUrl}/users`; // URL del backend
 
+export interface SessionUser {
+  id: number;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  cargo: string;
+  rol?: 'tecnico' | 'operador';
+}
+
 interface LoginResponse {
   token: string;
-  user: {
-    id: number;
-    nombre: string;
-    apellido: string;
-    dni: string;
-    cargo: string;
-  };
+  user: SessionUser;
 }
 
 @Injectable({
@@ -49,9 +52,13 @@ export class AuthService {
     return isAuth;
   }
 
-  getUser(): { id: number; nombre: string; apellido: string; dni: string; cargo: string } | null {
+  getUser(): SessionUser | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
+  }
+
+  esTecnico(): boolean {
+    return this.getUser()?.rol === 'tecnico';
   }
 
   register(user: any): Observable<any> {

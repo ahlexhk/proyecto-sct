@@ -90,6 +90,18 @@ export class NotificationService implements OnDestroy {
   }
 
   private procesar(res: NotificationsResponse): void {
+    // Aviso al entrar: en la primera consulta de la sesión se informa
+    // cuántas incidencias siguen pendientes de atención.
+    if (this.lastCheck === null && res.pendientes > 0) {
+      const s = res.pendientes === 1 ? '' : 's';
+      this.snackBar.open(
+        `Tienes ${res.pendientes} incidencia${s} de soporte pendiente${s}`,
+        'Cerrar',
+        { duration: 8000 }
+      );
+      this.noLeidosSubject.next(res.pendientes);
+    }
+
     this.pendientesSubject.next(res.pendientes);
 
     if (res.eventos.length > 0) {

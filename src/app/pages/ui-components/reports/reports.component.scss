@@ -42,6 +42,39 @@ table {
   width: 100%;
 }
 
+.soporte-totales {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+
+.soporte-total-item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  .soporte-valor {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .soporte-label {
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.55);
+  }
+}
+
+.soporte-subtitulo {
+  margin: 16px 0 8px;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.7);
+}
+
 .download-actions {
   display: flex;
   justify-content: flex-end;

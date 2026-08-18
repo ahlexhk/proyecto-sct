@@ -144,6 +144,87 @@
           </div>
         </mat-card-content>
       </mat-card>
+
+      <!-- Hoja de vida del equipo (requiere sesión) -->
+      <div class="loading-row" *ngIf="cargandoHistorial">
+        <mat-spinner diameter="24"></mat-spinner>
+        <span>Cargando hoja de vida…</span>
+      </div>
+
+      <div class="history-section card-enter" *ngIf="historial">
+        <h3 class="pending-title">Historial de movimientos ({{ historial.movimientos.length }})</h3>
+        <p class="history-empty" *ngIf="historial.movimientos.length === 0">
+          Este equipo aún no tiene movimientos registrados.
+        </p>
+        <div class="history-table-wrap" *ngIf="historial.movimientos.length > 0">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+                <th>Ubicación</th>
+                <th>Asignación</th>
+                <th>Observación</th>
+                <th>Registrado por</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of historial.movimientos">
+                <td>{{ m.created_at | date:'dd/MM/yy HH:mm' }}</td>
+                <td>{{ formatearMotivo(m.motivo) }}</td>
+                <td>
+                  <span *ngIf="m.estado_anterior !== m.estado_nuevo">
+                    {{ formatearMotivo(m.estado_anterior) }} → {{ formatearMotivo(m.estado_nuevo) }}
+                  </span>
+                  <span *ngIf="m.estado_anterior === m.estado_nuevo">{{ formatearMotivo(m.estado_nuevo) }}</span>
+                </td>
+                <td>
+                  <span *ngIf="m.ubicacion_anterior !== m.ubicacion_nueva">
+                    {{ m.ubicacion_anterior }} → {{ m.ubicacion_nueva }}
+                  </span>
+                  <span *ngIf="m.ubicacion_anterior === m.ubicacion_nueva">{{ m.ubicacion_nueva }}</span>
+                </td>
+                <td>
+                  <span *ngIf="m.asignacion_anterior !== m.asignacion_nueva">
+                    {{ m.asignacion_anterior }} → {{ m.asignacion_nueva }}
+                  </span>
+                  <span *ngIf="m.asignacion_anterior === m.asignacion_nueva">{{ m.asignacion_nueva }}</span>
+                </td>
+                <td>{{ m.observacion }}</td>
+                <td>{{ m.registradoPor ?? '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="pending-title m-t-16">Incidencias de soporte ({{ historial.incidencias.length }})</h3>
+        <p class="history-empty" *ngIf="historial.incidencias.length === 0">
+          Este equipo no tiene incidencias de soporte registradas.
+        </p>
+        <div class="pending-list" *ngIf="historial.incidencias.length > 0">
+          <a class="pending-item" *ngFor="let inc of historial.incidencias"
+            [routerLink]="['/ui-components/incidents']">
+            <div class="pending-main">
+              <div class="pending-title-row">
+                <span class="incident-id">#{{ inc.id }}</span>
+                <span class="pending-name">{{ inc.titulo }}</span>
+                <span class="priority-chip" [ngClass]="'priority-' + inc.prioridad">
+                  {{ etiquetaPrioridad[inc.prioridad] }}
+                </span>
+                <span class="status-chip" [ngClass]="'incident-status-' + inc.estado">
+                  {{ etiquetaEstadoIncidencia[inc.estado] }}
+                </span>
+              </div>
+              <div class="pending-meta">
+                {{ inc.solicitante }} · {{ inc.created_at | date:'dd/MM/yyyy HH:mm' }}
+                <span *ngIf="inc.asignadoA" class="assigned"> · {{ inc.asignadoA }}</span>
+              </div>
+            </div>
+            <span class="chevron">›</span>
+          </a>
+        </div>
+      </div>
     </div>
 
     <div *ngIf="error" class="error-message card-enter">

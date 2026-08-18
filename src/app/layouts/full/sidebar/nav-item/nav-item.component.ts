@@ -99,11 +99,13 @@ export class AppNavItemComponent implements OnInit {
   }
 
   isUiComponentRelated(item: NavItem | any): boolean {
-    return item.navCap === 'Ui Components' || (item.route && item.route.startsWith('/ui-components/'));
+    return ['Ui Components', 'Soporte técnico', 'Inventario'].includes(item.navCap)
+      || (item.route && item.route.startsWith('/ui-components/'));
   }
 
   isAuthRelated(item: NavItem | any): boolean {
-    return item.navCap === 'Auth' || (item.route && (item.route === '/authentication/login' || item.route === '/authentication/register'));
+    return ['Auth', 'Cuenta'].includes(item.navCap)
+      || (item.route && (item.route === '/authentication/login' || item.route === '/authentication/register'));
   }
 
   isMenuItemActive(item: NavItem | any): boolean {

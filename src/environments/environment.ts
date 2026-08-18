@@ -1,4 +1,6 @@
 export const environment = {
     production: false,
-    apiUrl: 'http://localhost:3000/api', // URL de tu API en desarrollo
+    // Ruta relativa: ng serve la redirige al backend vía proxy.conf.json,
+    // lo que permite acceder desde otros dispositivos o túneles.
+    apiUrl: '/api',
   };

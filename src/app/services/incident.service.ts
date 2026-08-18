@@ -25,6 +25,15 @@ export interface Incident {
   updated_at: string;
   resuelto_at: string | null;
   historial?: IncidentUpdate[];
+  fotos?: IncidentPhoto[];
+}
+
+export interface IncidentPhoto {
+  id: number;
+  original_name: string;
+  url: string;
+  subidaPor: string;
+  created_at: string;
 }
 
 export interface IncidentUpdate {
@@ -105,5 +114,13 @@ export class IncidentService {
     comentario?: string;
   }): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, cambios);
+  }
+
+  uploadPhotos(id: number, fotos: File[]): Observable<any> {
+    const formData = new FormData();
+    for (const foto of fotos) {
+      formData.append('fotos', foto);
+    }
+    return this.http.post(`${this.apiUrl}/${id}/photos`, formData);
   }
 }

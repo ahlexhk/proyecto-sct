@@ -3,7 +3,8 @@
 Aplicación Angular 18 (Material + plantilla Spike) para la gestión de soporte técnico e inventario de equipos:
 
 - **Centro de soporte** (dashboard): métricas de incidencias (abiertas, en proceso, críticas, resueltas hoy, tiempo promedio de resolución) y lista de pendientes.
-- **Incidencias**: registro de solicitudes de soporte con prioridad, solicitante, ubicación y equipo del inventario afectado (opcional); asignación de técnico, cambios de estado con comentarios e historial completo (requiere sesión).
+- **Incidencias**: registro de solicitudes de soporte con prioridad, solicitante, ubicación, equipo del inventario afectado (opcional) y fotos adjuntas; asignación de técnico (solo rol `tecnico`), cambios de estado con comentarios e historial completo (requiere sesión).
+- **Hoja de vida del equipo**: al buscar por Bien Nacional con sesión activa se muestra el historial de movimientos de inventario y las incidencias de soporte del equipo.
 - **Notificaciones**: campana en el encabezado que avisa (sondeo cada 30 s) cuando entra una nueva solicitud de soporte o cambia una incidencia.
 - **Consulta de equipos** (dashboard): búsqueda pública por Bien Nacional con estado, ubicación y último movimiento.
 - **Registro de equipos**: alta de equipos en el inventario (requiere sesión).
@@ -18,7 +19,13 @@ npm start        # ng serve en http://localhost:4200
 npm run build    # build de producción (dist/)
 ```
 
-La URL de la API se configura en `src/environments/environment.ts` (desarrollo) y `environment.prod.ts` (producción).
+En desarrollo la API se consume por ruta relativa `/api` a través de `proxy.conf.json` (redirige a `http://localhost:3000`), lo que permite probar desde otros dispositivos o exponer la app con un túnel:
+
+```
+cloudflared tunnel --url http://localhost:4200
+```
+
+(arrancar `ng serve` con `--host 0.0.0.0 --disable-host-check` para aceptar el host del túnel). En producción la URL de la API se configura en `src/environments/environment.prod.ts`.
 
 ## Autenticación
 

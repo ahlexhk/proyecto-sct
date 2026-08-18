@@ -17,6 +17,7 @@ import {
   IncidentService,
 } from 'src/app/services/incident.service';
 import { NotificationService } from 'src/app/services/notification.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-incidents',
@@ -69,9 +70,14 @@ export class IncidentsComponent implements OnInit {
   etiquetaEstado = ETIQUETA_ESTADO_INCIDENCIA;
   etiquetaPrioridad = ETIQUETA_PRIORIDAD;
 
+  // Fotos adjuntas
+  fotosSeleccionadas: File[] = [];
+  subiendoFotos = false;
+
   constructor(
     private incidentService: IncidentService,
     private notificationService: NotificationService,
+    public authService: AuthService,
     private snackBar: MatSnackBar
   ) { }
 
@@ -207,5 +213,32 @@ export class IncidentsComponent implements OnInit {
 
   esFinalizada(incident: Incident): boolean {
     return incident.estado === 'resuelta' || incident.estado === 'cerrada';
+  }
+
+  onFotosSeleccionadas(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.fotosSeleccionadas = Array.from(input.files ?? []).slice(0, 3);
+  }
+
+  subirFotos(): void {
+    if (!this.seleccionada || this.fotosSeleccionadas.length === 0) {
+      return;
+    }
+    this.subiendoFotos = true;
+    const id = this.seleccionada.id;
+    this.incidentService.uploadPhotos(id, this.fotosSeleccionadas).subscribe({
+      next: (res) => {
+        this.subiendoFotos = false;
+        this.fotosSeleccionadas = [];
+        this.snackBar.open(res.message ?? 'Fotos adjuntadas', 'Cerrar', { duration: 4000 });
+        this.incidentService.getIncident(id).subscribe({
+          next: (detalle) => (this.seleccionada = detalle),
+        });
+      },
+      error: (error) => {
+        this.subiendoFotos = false;
+        this.snackBar.open(error.error?.error ?? 'Error al subir las fotos', 'Cerrar', { duration: 5000 });
+      },
+    });
   }
 }

@@ -48,6 +48,15 @@
                         <app-error-messages [control]="f['cargo']"></app-error-messages>
                       </mat-form-field>
 
+                      <!-- Rol -->
+                      <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Rol en el sistema</mat-label>
+                      <mat-form-field appearance="outline" class="w-100" color="primary">
+                        <mat-select formControlName="rol">
+                          <mat-option value="operador">Operador (registra incidencias)</mat-option>
+                          <mat-option value="tecnico">Técnico de soporte (atiende incidencias)</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
                       <!-- Contraseña -->
                       <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Contraseña</mat-label>
                       <mat-form-field appearance="outline" class="w-100" color="primary">

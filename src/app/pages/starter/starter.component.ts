@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { Equipment, EquipmentService } from '../../services/equipment.service';
+import { Equipment, EquipmentHistory, EquipmentService } from '../../services/equipment.service';
 import {
   ETIQUETA_ESTADO_INCIDENCIA,
   ETIQUETA_PRIORIDAD,
@@ -53,13 +53,17 @@ export class StarterComponent implements OnInit {
   error: string = '';
   buscando = false;
 
+  // Hoja de vida del equipo (solo con sesión)
+  historial: EquipmentHistory | null = null;
+  cargandoHistorial = false;
+
   // Panel de soporte (solo con sesión)
   stats: IncidentStats | null = null;
   pendientes: Incident[] = [];
   cargandoSoporte = false;
 
-  etiquetaEstadoIncidencia = ETIQUETA_ESTADO_INCIDENCIA;
-  etiquetaPrioridad = ETIQUETA_PRIORIDAD;
+  etiquetaEstadoIncidencia: Record<string, string> = ETIQUETA_ESTADO_INCIDENCIA;
+  etiquetaPrioridad: Record<string, string> = ETIQUETA_PRIORIDAD;
 
   constructor(
     private equipmentService: EquipmentService,
@@ -103,6 +107,7 @@ export class StarterComponent implements OnInit {
 
   buscarEquipo() {
     this.equipoEncontrado = null;
+    this.historial = null;
     this.error = '';
 
     if (!this.bienNacional || !this.bienNacional.trim()) {
@@ -115,10 +120,27 @@ export class StarterComponent implements OnInit {
       next: (data) => {
         this.buscando = false;
         this.equipoEncontrado = data;
+        // Con sesión activa se carga la hoja de vida completa del equipo
+        if (this.authService.isLoggedIn()) {
+          this.cargarHistorial(data.bienNacional);
+        }
       },
       error: (error) => {
         this.buscando = false;
         this.error = error.message ?? 'Error al buscar el equipo. Por favor, intente nuevamente.';
+      }
+    });
+  }
+
+  cargarHistorial(bienNacional: string): void {
+    this.cargandoHistorial = true;
+    this.equipmentService.getEquipmentHistory(bienNacional).subscribe({
+      next: (historial) => {
+        this.cargandoHistorial = false;
+        this.historial = historial;
+      },
+      error: () => {
+        this.cargandoHistorial = false;
       }
     });
   }

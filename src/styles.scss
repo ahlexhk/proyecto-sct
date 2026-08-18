@@ -90,6 +90,52 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+/* ============================================================
+   Responsive: pantallas pequeñas (teléfonos)
+   ============================================================ */
+@media (max-width: 599px) {
+  /* Tarjetas con menos margen para aprovechar el ancho */
+  .cardWithShadow {
+    margin: 10px !important;
+    padding: 14px !important;
+  }
+
+  .heading-display {
+    font-size: 1.15rem;
+  }
+
+  /* Las filas de búsqueda y acciones se apilan en vertical */
+  .search-container,
+  .search-row,
+  .action-form {
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    button {
+      width: 100%;
+      margin-top: 0 !important;
+      height: 44px !important;
+    }
+  }
+
+  .button-container,
+  .download-actions,
+  .form-actions {
+    flex-direction: column !important;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  /* Tablas de Material con scroll horizontal en vez de romper el layout */
+  .mat-mdc-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
 /* Accesibilidad: sin desplazamientos para quienes reducen el movimiento */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -57,6 +57,13 @@ export class ReportsService {
     );
   }
 
+  // Reporte de soporte técnico: totales, por técnico y por ubicación
+  getReporteSoporte(fechaInicio: string, fechaFin: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/soporte`, {
+      params: { fechaInicio, fechaFin }
+    });
+  }
+
   getReportesCompletos(fechaInicio: string, fechaFin: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/reportes-completos`, {
       params: { fechaInicio, fechaFin }

@@ -54,4 +54,41 @@ export class EquipmentService {
   updateEquipmentStatus(id: number, changes: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}/status`, changes);
   }
+
+  // Hoja de vida: movimientos de inventario e incidencias del equipo
+  getEquipmentHistory(bienNacional: string): Observable<EquipmentHistory> {
+    const params = new HttpParams().set('bienNacional', bienNacional.trim());
+    return this.http.get<EquipmentHistory>(`${this.apiUrl}/history`, { params });
+  }
+}
+
+export interface EquipmentMovement {
+  id: number;
+  estado_anterior: string;
+  estado_nuevo: string;
+  ubicacion_anterior: string;
+  ubicacion_nueva: string;
+  asignacion_anterior: string;
+  asignacion_nueva: string;
+  motivo: string;
+  observacion: string;
+  created_at: string;
+  registradoPor: string | null;
+}
+
+export interface EquipmentIncident {
+  id: number;
+  titulo: string;
+  prioridad: string;
+  estado: string;
+  solicitante: string;
+  created_at: string;
+  resuelto_at: string | null;
+  asignadoA: string | null;
+}
+
+export interface EquipmentHistory {
+  equipo: Equipment;
+  movimientos: EquipmentMovement[];
+  incidencias: EquipmentIncident[];
 }
