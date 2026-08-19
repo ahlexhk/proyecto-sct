@@ -189,6 +189,11 @@
           </div>
 
           <div class="danger-row">
+            <button mat-raised-button color="primary" type="button" class="btn-press"
+              (click)="reportarIncidencia(puesto)">
+              ⚠ Reportar incidencia de este puesto
+            </button>
+            <span class="danger-spacer"></span>
             <button mat-stroked-button color="warn" type="button" class="btn-press" (click)="eliminarPuesto(puesto)">
               Eliminar puesto
             </button>

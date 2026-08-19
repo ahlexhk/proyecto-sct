@@ -17,6 +17,20 @@
 
     <!-- Alta de incidencia -->
     <div class="form-card card-enter" *ngIf="mostrandoFormulario">
+
+      <!-- Contexto del puesto de trabajo de origen -->
+      <div class="puesto-origen" *ngIf="puestoOrigen">
+        <span>Reportando incidencia del puesto <strong>{{ puestoOrigen }}</strong></span>
+        <div class="puesto-origen-equipos" *ngIf="equiposPuesto.length > 1">
+          <span class="puesto-origen-hint">Equipo afectado:</span>
+          <button type="button" class="filter-chip btn-press" *ngFor="let e of equiposPuesto"
+            [class.active]="incidentForm.value.bienNacional === e.bienNacional"
+            (click)="usarEquipoDelPuesto(e.bienNacional)">
+            {{ e.tipoEquipo }} · {{ e.bienNacional }}
+          </button>
+        </div>
+      </div>
+
       <form [formGroup]="incidentForm" (ngSubmit)="crearIncidencia()">
         <div class="row">
           <div class="col-sm-6 col-lg-8">

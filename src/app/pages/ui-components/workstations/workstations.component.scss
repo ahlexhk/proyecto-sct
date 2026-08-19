@@ -252,10 +252,16 @@ mat-form-field {
 
 .danger-row {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-top: 8px;
   padding-top: 10px;
   border-top: 1px dashed rgba(0, 0, 0, 0.08);
+
+  .danger-spacer {
+    flex: 1;
+  }
 }
 
 @media (max-width: 599px) {

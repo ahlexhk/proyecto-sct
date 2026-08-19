@@ -65,6 +65,36 @@ html.dark-theme {
   .sidebarNav {
     background-color: #111c2d !important;
   }
+
+  /* Texto e iconos del menú lateral legibles en oscuro */
+  .sidebar-list {
+    .nav-caption {
+      color: rgba(255, 255, 255, 0.55) !important;
+    }
+
+    .menu-list-item {
+      .mdc-list-item__primary-text,
+      .hide-menu {
+        color: rgba(255, 255, 255, 0.85) !important;
+      }
+
+      .routeIcon,
+      .mat-mdc-list-item-icon {
+        color: rgba(255, 255, 255, 0.65) !important;
+      }
+
+      /* Estados activo/hover mantienen el acento azul del tema */
+      &.activeMenu,
+      &:hover {
+        .routeIcon,
+        .mat-mdc-list-item-icon,
+        .mdc-list-item__primary-text,
+        .hide-menu {
+          color: #60a5fa !important;
+        }
+      }
+    }
+  }
 }
 
 /* ============================================================

@@ -9,13 +9,21 @@ import { RouterModule } from '@angular/router';
     <div class="branding">
       <a [routerLink]="['/']">
         <img
-          src="/assets/images/logos/fnns-logo.jpg"
-          class="align-middle m-2"
+          src="/assets/images/logos/fnns-logo.png"
+          class="align-middle m-2 branding-logo"
           alt="logo"
         />
       </a>
     </div>
   `,
+  styles: [`
+    .branding-logo {
+      max-width: 150px;
+      height: auto;
+      display: block;
+      margin: 12px auto;
+    }
+  `],
 })
 export class BrandingComponent {
   constructor() {}

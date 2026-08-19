@@ -52,6 +52,29 @@ mat-form-field {
   padding: 8px 0 16px;
 }
 
+/* Contexto cuando la incidencia se reporta desde un puesto de trabajo */
+.puesto-origen {
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  background: var(--status-info-bg);
+  color: var(--status-info-text);
+  font-size: 0.875rem;
+
+  .puesto-origen-equipos {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .puesto-origen-hint {
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+}
+
 /* ---------- Filtros ---------- */
 .filters-row {
   display: flex;

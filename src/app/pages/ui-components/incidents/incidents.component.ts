@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -19,7 +20,8 @@ import {
 import { NotificationService } from 'src/app/services/notification.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { EquipmentService } from 'src/app/services/equipment.service';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { WorkstationEquipment, WorkstationService } from 'src/app/services/workstation.service';
+import { debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-incidents',
@@ -80,10 +82,16 @@ export class IncidentsComponent implements OnInit {
   bnEstado: 'vacio' | 'verificando' | 'valido' | 'invalido' = 'vacio';
   bnDetalle = '';
 
+  // Cuando la incidencia se reporta desde un puesto de trabajo
+  puestoOrigen: string | null = null;
+  equiposPuesto: WorkstationEquipment[] = [];
+
   constructor(
     private incidentService: IncidentService,
     private notificationService: NotificationService,
     private equipmentService: EquipmentService,
+    private workstationService: WorkstationService,
+    private route: ActivatedRoute,
     public authService: AuthService,
     private snackBar: MatSnackBar
   ) { }
@@ -91,11 +99,44 @@ export class IncidentsComponent implements OnInit {
   ngOnInit(): void {
     this.cargar();
 
+    // ¿Llegamos desde "Reportar incidencia" de un puesto de trabajo?
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
+      const puestoId = Number(params['puesto']);
+      if (puestoId) {
+        this.precargarDesdePuesto(puestoId);
+      }
+    });
+
     // El sistema gira alrededor del Bien Nacional: al escribirlo se
     // verifica en vivo contra el inventario y se avisa si no existe.
     this.incidentForm.get('bienNacional')?.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe((valor) => this.validarBnIncidencia((valor ?? '').trim()));
+  }
+
+  private precargarDesdePuesto(puestoId: number): void {
+    this.workstationService.getWorkstations().subscribe({
+      next: (puestos) => {
+        const puesto = puestos.find((p) => p.id === puestoId);
+        if (!puesto) {
+          return;
+        }
+        this.puestoOrigen = puesto.nombre;
+        this.equiposPuesto = puesto.equipos;
+        this.mostrandoFormulario = true;
+        this.incidentForm.patchValue({
+          ubicacion: puesto.ubicacion,
+          solicitante: puesto.responsable,
+          // Si el puesto tiene un solo equipo, se preselecciona su BN
+          bienNacional: puesto.equipos.length === 1 ? puesto.equipos[0].bienNacional : '',
+        });
+      },
+      error: () => { },
+    });
+  }
+
+  usarEquipoDelPuesto(bn: string): void {
+    this.incidentForm.patchValue({ bienNacional: bn });
   }
 
   private validarBnIncidencia(bn: string): void {

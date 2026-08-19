@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -66,8 +67,16 @@ export class WorkstationsComponent implements OnInit {
   constructor(
     private workstationService: WorkstationService,
     private equipmentService: EquipmentService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) { }
+
+  // Abre el formulario de incidencias con los datos del puesto precargados
+  reportarIncidencia(puesto: Workstation): void {
+    this.router.navigate(['/ui-components/incidents'], {
+      queryParams: { puesto: puesto.id }
+    });
+  }
 
   ngOnInit(): void {
     this.cargar();
