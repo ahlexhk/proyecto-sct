@@ -4,11 +4,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.theme-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-}
-
 mat-form-field {
   width: 100%;
 }
@@ -20,12 +15,6 @@ mat-form-field {
   gap: 16px;
   flex-wrap: wrap;
   width: 100%;
-}
-
-.section-subtitle {
-  color: rgba(0, 0, 0, 0.55);
-  font-size: 0.875rem;
-  margin-top: 4px;
 }
 
 .row {
@@ -53,8 +42,8 @@ mat-form-field {
   padding: 16px 20px 4px;
   margin-bottom: 20px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
 }
 
 .form-actions {
@@ -80,23 +69,23 @@ mat-form-field {
 }
 
 .filter-chip {
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border-subtle);
   background: transparent;
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--text-secondary);
   transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background: var(--surface-hover);
   }
 
   &.active {
-    background: #1e88e5;
-    border-color: #1e88e5;
+    background: var(--accent);
+    border-color: var(--accent);
     color: #fff;
   }
 }
@@ -117,14 +106,14 @@ mat-form-field {
   align-items: center;
   gap: 12px;
   margin: 24px 0;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-secondary);
 }
 
 /* ---------- Estado vacío ---------- */
 .empty-state {
   text-align: center;
   padding: 40px 16px;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--text-secondary);
 
   .empty-title {
     font-weight: 600;
@@ -146,19 +135,19 @@ mat-form-field {
 }
 
 .incident-card {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface-card);
   transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
 
   &.selected {
-    border-color: #1e88e5;
+    border-color: var(--accent);
     box-shadow: 0 4px 16px rgba(30, 136, 229, 0.12);
   }
 
   &.finalizada .incident-title {
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--text-muted);
   }
 }
 
@@ -174,9 +163,10 @@ mat-form-field {
   cursor: pointer;
   text-align: left;
   font: inherit;
+  color: var(--text-primary);
 
   &:hover {
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--surface-hover);
   }
 }
 
@@ -194,7 +184,7 @@ mat-form-field {
 
 .incident-id {
   font-size: 0.8rem;
-  color: rgba(0, 0, 0, 0.4);
+  color: var(--text-muted);
   font-weight: 600;
 }
 
@@ -210,17 +200,17 @@ mat-form-field {
   flex-wrap: wrap;
   margin-top: 6px;
   font-size: 0.8rem;
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--text-secondary);
 
   .assigned {
-    color: #1e88e5;
+    color: var(--status-info-text);
     font-weight: 500;
   }
 }
 
 .chevron {
   font-size: 1.4rem;
-  color: rgba(0, 0, 0, 0.35);
+  color: var(--text-muted);
   transition: transform 200ms cubic-bezier(0.25, 1, 0.5, 1);
 
   &.open {
@@ -228,38 +218,15 @@ mat-form-field {
   }
 }
 
-/* ---------- Chips de prioridad ---------- */
-.priority-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 10px;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-
-.priority-baja { background: rgba(0, 0, 0, 0.06); color: rgba(0, 0, 0, 0.6); }
-.priority-media { background: rgba(30, 136, 229, 0.1); color: #1565c0; }
-.priority-alta { background: rgba(255, 170, 0, 0.15); color: #9a6700; }
-.priority-critica { background: rgba(207, 34, 46, 0.12); color: #cf222e; }
-
-/* Chips de estado de incidencia (reutiliza .status-chip global) */
-.incident-status-abierta { background: rgba(207, 34, 46, 0.1); color: #cf222e; }
-.incident-status-en_proceso { background: rgba(30, 136, 229, 0.12); color: #1565c0; }
-.incident-status-en_espera { background: rgba(255, 170, 0, 0.15); color: #9a6700; }
-.incident-status-resuelta { background: rgba(46, 160, 67, 0.12); color: #1a7f37; }
-.incident-status-cerrada { background: rgba(0, 0, 0, 0.07); color: rgba(0, 0, 0, 0.55); }
-
 /* ---------- Detalle ---------- */
 .incident-detail {
   padding: 4px 18px 18px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--border-soft);
 }
 
 .incident-description {
   font-size: 0.9rem;
-  color: rgba(0, 0, 0, 0.75);
+  color: var(--text-primary);
   margin: 14px 0;
   white-space: pre-line;
 }
@@ -279,85 +246,8 @@ mat-form-field {
 
 .detail-label {
   font-size: 0.72rem;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--text-muted);
   letter-spacing: 0.02em;
-}
-
-/* ---------- Historial (timeline) ---------- */
-.timeline-title {
-  margin: 8px 0 10px;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-bottom: 16px;
-}
-
-.timeline-item {
-  display: flex;
-  gap: 12px;
-  position: relative;
-  padding-bottom: 14px;
-
-  &:not(:last-child)::before {
-    content: '';
-    position: absolute;
-    left: 5px;
-    top: 14px;
-    bottom: 0;
-    width: 2px;
-    background: rgba(0, 0, 0, 0.08);
-  }
-}
-
-.timeline-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-top: 4px;
-  flex-shrink: 0;
-  z-index: 1;
-}
-
-.dot-creacion { background: #cf222e; }
-.dot-asignacion { background: #1e88e5; }
-.dot-cambio_estado { background: #9a6700; }
-.dot-comentario { background: rgba(0, 0, 0, 0.35); }
-
-.timeline-content {
-  flex: 1;
-  font-size: 0.85rem;
-}
-
-.timeline-head {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-}
-
-.timeline-date {
-  font-size: 0.75rem;
-  color: rgba(0, 0, 0, 0.45);
-}
-
-.timeline-body {
-  color: rgba(0, 0, 0, 0.65);
-
-  em {
-    font-style: normal;
-    font-weight: 600;
-  }
-}
-
-.timeline-comment {
-  margin: 4px 0 0;
-  color: rgba(0, 0, 0, 0.8);
 }
 
 /* ---------- Fotos ---------- */
@@ -374,7 +264,7 @@ mat-form-field {
   height: 96px;
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-subtle);
   transition: transform 120ms ease-out, box-shadow 150ms ease-out;
 
   img {
@@ -402,14 +292,106 @@ mat-form-field {
   }
 }
 
+/* ---------- Historial (timeline) ---------- */
+.timeline-title {
+  margin: 8px 0 10px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  position: relative;
+  padding-bottom: 14px;
+  /* La plantilla Spike fija height en .timeline .timeline-item (70px/25px):
+     aquí el alto lo dicta el contenido (comentarios de varias líneas). */
+  height: auto !important;
+
+  &:last-child {
+    height: auto !important;
+  }
+
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 14px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-soft);
+  }
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.dot-creacion { background: var(--status-err-text); }
+.dot-asignacion { background: var(--status-info-text); }
+.dot-cambio_estado { background: var(--status-warn-text); }
+.dot-comentario { background: var(--text-muted); }
+
+.timeline-content {
+  flex: 1;
+  font-size: 0.85rem;
+}
+
+.timeline-head {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.timeline-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.timeline-body {
+  color: var(--text-secondary);
+
+  em {
+    font-style: normal;
+    font-weight: 600;
+  }
+}
+
+.timeline-comment {
+  margin: 4px 0 0;
+  color: var(--text-primary);
+}
+
 /* ---------- Acciones ---------- */
 .action-bar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   flex-wrap: wrap;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 1;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  background: var(--surface-card);
+
+  > button {
+    margin-top: 4px;
+  }
 }
 
 .action-form {
@@ -434,6 +416,7 @@ mat-form-field {
 }
 
 .closed-note {
-  color: rgba(0, 0, 0, 0.55);
+  color: var(--text-secondary);
   font-size: 0.875rem;
+  margin-top: 12px;
 }

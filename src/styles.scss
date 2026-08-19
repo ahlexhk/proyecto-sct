@@ -4,13 +4,73 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* ============================================================
+   Tokens de tema (claro / oscuro)
+   La clase light-theme / dark-theme vive en <html> (ThemeService).
+   ============================================================ */
+:root, html.light-theme {
+  --surface-card: #ffffff;
+  --surface-soft: rgba(0, 0, 0, 0.03);
+  --surface-hover: rgba(0, 0, 0, 0.02);
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-soft: rgba(0, 0, 0, 0.06);
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.55);
+  --text-muted: rgba(0, 0, 0, 0.45);
+  --topbar-bg: rgba(255, 255, 255, 0.72);
+
+  --status-ok-text: #1a7f37;
+  --status-ok-bg: rgba(46, 160, 67, 0.12);
+  --status-warn-text: #9a6700;
+  --status-warn-bg: rgba(255, 170, 0, 0.15);
+  --status-err-text: #cf222e;
+  --status-err-bg: rgba(207, 34, 46, 0.12);
+  --status-info-text: #1565c0;
+  --status-info-bg: rgba(30, 136, 229, 0.12);
+  --accent: #1e88e5;
+}
+
+html.dark-theme {
+  --surface-card: #111c2d;
+  --surface-soft: rgba(255, 255, 255, 0.05);
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --border-subtle: rgba(255, 255, 255, 0.14);
+  --border-soft: rgba(255, 255, 255, 0.09);
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --topbar-bg: rgba(17, 28, 45, 0.78);
+
+  --status-ok-text: #4ade80;
+  --status-ok-bg: rgba(74, 222, 128, 0.14);
+  --status-warn-text: #fbbf24;
+  --status-warn-bg: rgba(251, 191, 36, 0.14);
+  --status-err-text: #f87171;
+  --status-err-bg: rgba(248, 113, 113, 0.16);
+  --status-info-text: #60a5fa;
+  --status-info-bg: rgba(96, 165, 250, 0.16);
+  --accent: #60a5fa;
+}
+
+/* Fondos de la aplicación en tema oscuro */
+html.dark-theme {
+  background-color: #15263a;
+
+  body,
+  .mainWrapper,
+  .contentWrapper,
+  .pageWrapper {
+    background-color: #15263a !important;
+  }
+
+  .sidebarNav {
+    background-color: #111c2d !important;
+  }
+}
+
+/* ============================================================
    Fundamentos de interacción (apple-design)
-   - feedback instantáneo en el press, no en el release
-   - animaciones cortas que parten del valor actual
-   - respeto por prefers-reduced-motion
    ============================================================ */
 
-/* Feedback inmediato al presionar cualquier botón de Material */
 .btn-press {
   transition: transform 100ms ease-out, box-shadow 150ms ease-out;
 
@@ -30,7 +90,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
-/* Entrada suave de páginas y bloques: corta, sin rebote (critically damped) */
 @keyframes page-enter {
   from {
     opacity: 0;
@@ -50,13 +109,25 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   animation: page-enter 240ms cubic-bezier(0.25, 1, 0.5, 1) both;
 }
 
-/* Tipografía: tracking negativo en títulos grandes, cuerpo neutro */
 .heading-display {
   letter-spacing: -0.02em;
   font-weight: 700;
 }
 
-/* Chips de estado del inventario */
+/* Tarjetas personalizadas: superficie según el tema */
+.theme-card {
+  background-color: var(--surface-card) !important;
+  color: var(--text-primary);
+}
+
+.section-subtitle,
+.dashboard-subtitle {
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================================
+   Chips de estado (inventario e incidencias)
+   ============================================================ */
 .status-chip {
   display: inline-flex;
   align-items: center;
@@ -68,25 +139,115 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   white-space: nowrap;
 }
 
-.status-operativo {
-  background: rgba(46, 160, 67, 0.12);
-  color: #1a7f37;
+.status-operativo { background: var(--status-ok-bg); color: var(--status-ok-text); }
+.status-reparacion { background: var(--status-warn-bg); color: var(--status-warn-text); }
+.status-inoperativo { background: var(--status-err-bg); color: var(--status-err-text); }
+
+.incident-status-abierta { background: var(--status-err-bg); color: var(--status-err-text); }
+.incident-status-en_proceso { background: var(--status-info-bg); color: var(--status-info-text); }
+.incident-status-en_espera { background: var(--status-warn-bg); color: var(--status-warn-text); }
+.incident-status-resuelta { background: var(--status-ok-bg); color: var(--status-ok-text); }
+.incident-status-cerrada { background: var(--surface-soft); color: var(--text-secondary); }
+
+.priority-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-.status-reparacion {
-  background: rgba(255, 170, 0, 0.15);
-  color: #9a6700;
+.priority-baja { background: var(--surface-soft); color: var(--text-secondary); }
+.priority-media { background: var(--status-info-bg); color: var(--status-info-text); }
+.priority-alta { background: var(--status-warn-bg); color: var(--status-warn-text); }
+.priority-critica { background: var(--status-err-bg); color: var(--status-err-text); }
+
+/* Etiqueta de Bien Nacional: el identificador central del sistema */
+.bn-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--status-info-bg);
+  color: var(--status-info-text);
+  border: 1px solid color-mix(in srgb, var(--status-info-text) 30%, transparent);
 }
 
-.status-inoperativo {
-  background: rgba(207, 34, 46, 0.12);
-  color: #cf222e;
+/* Avisos de validación en vivo */
+.hint-ok {
+  color: var(--status-ok-text) !important;
+  font-weight: 500;
+}
+
+.hint-error {
+  color: var(--status-err-text) !important;
+  font-weight: 500;
+}
+
+/* ============================================================
+   Banner global de incidencias pendientes
+   ============================================================ */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--status-info-text);
+  background: var(--status-info-bg);
+  border: 1px solid color-mix(in srgb, var(--status-info-text) 25%, transparent);
+  font-size: 0.875rem;
+  transition: transform 120ms ease-out, box-shadow 150ms ease-out;
+
+  &:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  .alert-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    animation: alert-pulse 2s ease-in-out infinite;
+  }
+
+  .alert-text {
+    flex: 1;
+  }
+
+  .alert-action {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  &.alert-critical {
+    color: var(--status-err-text);
+    background: var(--status-err-bg);
+    border-color: color-mix(in srgb, var(--status-err-text) 30%, transparent);
+  }
+}
+
+@keyframes alert-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 /* Foco visible para navegación por teclado */
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid #1e88e5;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -94,7 +255,6 @@ button:focus-visible {
    Responsive: pantallas pequeñas (teléfonos)
    ============================================================ */
 @media (max-width: 599px) {
-  /* Tarjetas con menos margen para aprovechar el ancho */
   .cardWithShadow {
     margin: 10px !important;
     padding: 14px !important;
@@ -104,7 +264,11 @@ button:focus-visible {
     font-size: 1.15rem;
   }
 
-  /* Las filas de búsqueda y acciones se apilan en vertical */
+  .contentWrapper {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
   .search-container,
   .search-row,
   .action-form {
@@ -128,11 +292,19 @@ button:focus-visible {
     }
   }
 
-  /* Tablas de Material con scroll horizontal en vez de romper el layout */
   .mat-mdc-table {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
+  }
+
+  .alert-banner {
+    flex-wrap: wrap;
+
+    .alert-action {
+      width: 100%;
+      text-align: right;
+    }
   }
 }
 
@@ -148,6 +320,10 @@ button:focus-visible {
 
   .page-enter,
   .card-enter {
+    animation: none;
+  }
+
+  .alert-banner .alert-dot {
     animation: none;
   }
 }

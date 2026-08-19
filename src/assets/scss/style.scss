@@ -11,6 +11,16 @@
 @import "themecolors/default_theme";
 @include mat.all-component-themes($bluetheme);
 
+// Tema oscuro: la clase dark-theme vive en <html> (la aplica ThemeService)
+.dark-theme {
+  @include mat.all-component-colors($darkbluetheme);
+
+  .bg-white,
+  .auth-card {
+    background-color: $darkcardbg !important;
+  }
+}
+
 //container layout
 @import "overrides/materialoverrides";
 @import "container";

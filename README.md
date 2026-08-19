@@ -5,7 +5,8 @@ Aplicación Angular 18 (Material + plantilla Spike) para la gestión de soporte 
 - **Centro de soporte** (dashboard): métricas de incidencias (abiertas, en proceso, críticas, resueltas hoy, tiempo promedio de resolución) y lista de pendientes.
 - **Incidencias**: registro de solicitudes de soporte con prioridad, solicitante, ubicación, equipo del inventario afectado (opcional) y fotos adjuntas; asignación de técnico (solo rol `tecnico`), cambios de estado con comentarios e historial completo (requiere sesión).
 - **Hoja de vida del equipo**: al buscar por Bien Nacional con sesión activa se muestra el historial de movimientos de inventario y las incidencias de soporte del equipo.
-- **Notificaciones**: campana en el encabezado que avisa (sondeo cada 30 s) cuando entra una nueva solicitud de soporte o cambia una incidencia.
+- **Notificaciones omnipresentes**: campana con el número de incidencias pendientes siempre visible, banner global en todas las páginas (en rojo si hay críticas), contador en el título de la pestaña `(N) SGE-FNNS`, aviso al iniciar sesión y sondeo cada 30 s con snackbar cuando entra una nueva solicitud.
+- **Tema claro/oscuro**: conmutador en el encabezado (sol/luna), persistido y respetando `prefers-color-scheme` por defecto.
 - **Consulta de equipos** (dashboard): búsqueda pública por Bien Nacional con estado, ubicación y último movimiento.
 - **Registro de equipos por tipo**: cada producto (PC, monitor, teclado, mouse, cornetas, impresora…) se registra con su propio Bien Nacional; las PCs y laptops llevan especificaciones estructuradas (procesador, RAM, almacenamiento, SO). El formulario avisa en vivo si el Bien Nacional ya está registrado.
 - **Puestos de trabajo**: agrupan varios equipos vinculados por su Bien Nacional (la PC con su monitor, teclado, mouse…), con responsable y ubicación; la vinculación valida en vivo contra el inventario y avisa si el equipo ya pertenece a otro puesto (con opción de moverlo).

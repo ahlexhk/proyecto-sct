@@ -81,3 +81,24 @@ table {
   gap: 16px;
   margin-top: 24px;
 }
+
+/* ---------- Ajustes de tema claro/oscuro ---------- */
+h3 {
+  color: var(--status-info-text);
+}
+
+.loading-row {
+  color: var(--text-secondary);
+}
+
+.soporte-total-item {
+  background: var(--surface-soft);
+  border-color: var(--border-soft);
+
+  .soporte-valor { color: var(--text-primary); }
+  .soporte-label { color: var(--text-secondary); }
+}
+
+.soporte-subtitulo {
+  color: var(--text-secondary);
+}

@@ -53,6 +53,16 @@ export class WorkstationsComponent implements OnInit {
   validacionBn: EstadoValidacionBn = { tipo: 'vacio' };
   vinculando = false;
 
+  // Edición de los datos del puesto
+  editando = false;
+  guardandoEdicion = false;
+  editForm = new FormGroup({
+    nombre: new FormControl('', [Validators.required, Validators.maxLength(255)]),
+    ubicacion: new FormControl('', [Validators.required, Validators.maxLength(255)]),
+    responsable: new FormControl('', [Validators.required, Validators.maxLength(255)]),
+    descripcion: new FormControl(''),
+  });
+
   constructor(
     private workstationService: WorkstationService,
     private equipmentService: EquipmentService,
@@ -120,6 +130,47 @@ export class WorkstationsComponent implements OnInit {
     this.expandido = this.expandido === puesto.id ? null : puesto.id;
     this.bnControl.setValue('');
     this.validacionBn = { tipo: 'vacio' };
+    this.editando = false;
+  }
+
+  iniciarEdicion(puesto: Workstation): void {
+    this.editando = true;
+    this.editForm.setValue({
+      nombre: puesto.nombre,
+      ubicacion: puesto.ubicacion,
+      responsable: puesto.responsable,
+      descripcion: puesto.descripcion ?? '',
+    });
+  }
+
+  cancelarEdicion(): void {
+    this.editando = false;
+  }
+
+  guardarEdicion(puesto: Workstation): void {
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+    this.guardandoEdicion = true;
+    const v = this.editForm.value;
+    this.workstationService.updateWorkstation(puesto.id, {
+      nombre: v.nombre!,
+      ubicacion: v.ubicacion!,
+      responsable: v.responsable!,
+      descripcion: v.descripcion || null,
+    }).subscribe({
+      next: () => {
+        this.guardandoEdicion = false;
+        this.editando = false;
+        this.snackBar.open('Datos del puesto actualizados', 'Cerrar', { duration: 4000 });
+        this.cargar();
+      },
+      error: (error) => {
+        this.guardandoEdicion = false;
+        this.snackBar.open(error.error?.error ?? 'Error al actualizar el puesto', 'Cerrar', { duration: 5000 });
+      },
+    });
   }
 
   private validarBn(valor: string): void {

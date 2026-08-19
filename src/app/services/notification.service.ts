@@ -16,11 +16,13 @@ export interface NotificationEvent {
   titulo: string;
   prioridad: string;
   estado: string;
+  bienNacional: string | null;
   autor: string;
 }
 
 interface NotificationsResponse {
   pendientes: number;
+  criticas: number;
   eventos: NotificationEvent[];
   serverTime: string;
 }
@@ -36,6 +38,9 @@ const MAX_EVENTOS = 20;
 export class NotificationService implements OnDestroy {
   private pendientesSubject = new BehaviorSubject<number>(0);
   pendientes$ = this.pendientesSubject.asObservable();
+
+  private criticasSubject = new BehaviorSubject<number>(0);
+  criticas$ = this.criticasSubject.asObservable();
 
   private eventosSubject = new BehaviorSubject<NotificationEvent[]>([]);
   eventos$ = this.eventosSubject.asObservable();
@@ -103,6 +108,11 @@ export class NotificationService implements OnDestroy {
     }
 
     this.pendientesSubject.next(res.pendientes);
+    this.criticasSubject.next(res.criticas ?? 0);
+
+    // El título de la pestaña refleja las incidencias pendientes
+    const tituloBase = document.title.replace(/^\(\d+\)\s*/, '');
+    document.title = res.pendientes > 0 ? `(${res.pendientes}) ${tituloBase}` : tituloBase;
 
     if (res.eventos.length > 0) {
       const acumulados = [...res.eventos, ...this.eventosSubject.value].slice(0, MAX_EVENTOS);

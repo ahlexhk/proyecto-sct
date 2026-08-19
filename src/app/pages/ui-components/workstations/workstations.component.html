@@ -101,6 +101,57 @@
         <!-- Detalle: gestión de equipos del puesto -->
         <div class="puesto-detail card-enter" *ngIf="expandido === puesto.id">
 
+          <!-- Edición de los datos del puesto -->
+          <div class="edit-toggle-row" *ngIf="!editando">
+            <button mat-stroked-button type="button" class="btn-press" (click)="iniciarEdicion(puesto)">
+              ✎ Editar datos del puesto
+            </button>
+          </div>
+
+          <form class="edit-form card-enter" [formGroup]="editForm" (ngSubmit)="guardarEdicion(puesto)" *ngIf="editando">
+            <div class="row">
+              <div class="col-sm-6 col-lg-4">
+                <mat-form-field appearance="outline">
+                  <mat-label>Nombre del puesto</mat-label>
+                  <input matInput formControlName="nombre">
+                  @if (editForm.controls.nombre.touched && editForm.controls.nombre.hasError('required')) {
+                    <mat-error>El nombre es requerido</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="col-sm-6 col-lg-4">
+                <mat-form-field appearance="outline">
+                  <mat-label>Ubicación</mat-label>
+                  <input matInput formControlName="ubicacion">
+                  @if (editForm.controls.ubicacion.touched && editForm.controls.ubicacion.hasError('required')) {
+                    <mat-error>La ubicación es requerida</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="col-sm-6 col-lg-4">
+                <mat-form-field appearance="outline">
+                  <mat-label>Responsable</mat-label>
+                  <input matInput formControlName="responsable">
+                  @if (editForm.controls.responsable.touched && editForm.controls.responsable.hasError('required')) {
+                    <mat-error>El responsable es requerido</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Descripción (opcional)</mat-label>
+                  <input matInput formControlName="descripcion">
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="edit-actions">
+              <button mat-stroked-button type="button" class="btn-press" (click)="cancelarEdicion()">Cancelar</button>
+              <button mat-raised-button color="primary" type="submit" class="btn-press" [disabled]="guardandoEdicion">
+                {{ guardandoEdicion ? 'Guardando…' : 'Guardar cambios' }}
+              </button>
+            </div>
+          </form>
+
           <div class="equipos-tabla" *ngIf="puesto.equipos.length > 0">
             <div class="equipo-row" *ngFor="let e of puesto.equipos">
               <span class="equipo-tipo">{{ e.tipoEquipo }}</span>

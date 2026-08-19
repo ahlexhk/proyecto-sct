@@ -125,3 +125,13 @@ mat-form-field {
   gap: 16px;
   margin-top: 24px;
 }
+
+/* ---------- Ajustes de tema claro/oscuro ---------- */
+.equipment-summary {
+  background: var(--surface-soft);
+  border-color: var(--border-soft);
+}
+
+.summary-label { color: var(--text-muted); }
+.summary-title { color: var(--text-primary); }
+.summary-value { color: var(--text-primary); }

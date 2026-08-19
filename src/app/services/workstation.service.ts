@@ -37,6 +37,10 @@ export class WorkstationService {
     return this.http.post(this.apiUrl, puesto);
   }
 
+  updateWorkstation(id: number, puesto: { nombre: string; ubicacion: string; responsable: string; descripcion?: string | null }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, puesto);
+  }
+
   deleteWorkstation(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

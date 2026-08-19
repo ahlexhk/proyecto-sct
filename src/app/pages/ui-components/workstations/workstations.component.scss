@@ -268,3 +268,49 @@ mat-form-field {
     }
   }
 }
+
+/* ---------- Edición del puesto ---------- */
+.edit-toggle-row {
+  margin: 12px 0 4px;
+}
+
+.edit-form {
+  padding: 12px 14px 2px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+  margin: 12px 0;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Ajustes de tema claro/oscuro ---------- */
+.puesto-card {
+  background: var(--surface-card);
+  border-color: var(--border-subtle);
+}
+
+.puesto-summary {
+  color: var(--text-primary);
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.puesto-meta { color: var(--text-secondary); }
+.equipo-chip { border-color: var(--border-subtle); color: var(--text-secondary); }
+.chevron { color: var(--text-muted); }
+.puesto-detail { border-top-color: var(--border-soft); }
+.equipo-row { border-bottom-color: var(--border-soft); }
+.equipo-bn { color: var(--text-secondary); }
+.form-card { background: var(--surface-soft); border-color: var(--border-soft); }
+.loading-row, .empty-state { color: var(--text-secondary); }
+.empty-hint { color: var(--text-muted); }
+.danger-row { border-top-color: var(--border-soft); }

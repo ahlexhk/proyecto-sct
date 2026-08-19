@@ -1,4 +1,4 @@
-<mat-sidenav-container class="mainWrapper blue_theme  light-theme" autosize autoFocus dir="ltr">
+<mat-sidenav-container class="mainWrapper blue_theme" autosize autoFocus dir="ltr">
   <!-- ============================================================== -->
   <!-- Vertical Sidebar -->
   <!-- ============================================================== -->
@@ -40,6 +40,21 @@
           (toggleMobileNav)="sidenav.toggle()"></app-header>
       </ng-container>
 
+      <!-- Banner de incidencias pendientes: visible en todas las páginas -->
+      <ng-container *ngIf="authService.isLoggedIn() && (notificationService.pendientes$ | async) as pendientes">
+        <a class="alert-banner card-enter" *ngIf="pendientes > 0"
+          [class.alert-critical]="((notificationService.criticas$ | async) ?? 0) > 0"
+          [routerLink]="['/ui-components/incidents']">
+          <span class="alert-dot"></span>
+          <span class="alert-text">
+            {{ pendientes }} incidencia{{ pendientes === 1 ? '' : 's' }} de soporte pendiente{{ pendientes === 1 ? '' : 's' }}
+            <ng-container *ngIf="((notificationService.criticas$ | async) ?? 0) as criticas">
+              <strong *ngIf="criticas > 0"> · {{ criticas }} crítica{{ criticas === 1 ? '' : 's' }}</strong>
+            </ng-container>
+          </span>
+          <span class="alert-action">Atender →</span>
+        </a>
+      </ng-container>
 
       <div class="m-t-30">
 

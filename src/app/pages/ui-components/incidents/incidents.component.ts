@@ -18,6 +18,8 @@ import {
 } from 'src/app/services/incident.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { EquipmentService } from 'src/app/services/equipment.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-incidents',
@@ -74,15 +76,45 @@ export class IncidentsComponent implements OnInit {
   fotosSeleccionadas: File[] = [];
   subiendoFotos = false;
 
+  // Validación en vivo del Bien Nacional del formulario de alta
+  bnEstado: 'vacio' | 'verificando' | 'valido' | 'invalido' = 'vacio';
+  bnDetalle = '';
+
   constructor(
     private incidentService: IncidentService,
     private notificationService: NotificationService,
+    private equipmentService: EquipmentService,
     public authService: AuthService,
     private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
     this.cargar();
+
+    // El sistema gira alrededor del Bien Nacional: al escribirlo se
+    // verifica en vivo contra el inventario y se avisa si no existe.
+    this.incidentForm.get('bienNacional')?.valueChanges
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe((valor) => this.validarBnIncidencia((valor ?? '').trim()));
+  }
+
+  private validarBnIncidencia(bn: string): void {
+    if (!bn) {
+      this.bnEstado = 'vacio';
+      this.bnDetalle = '';
+      return;
+    }
+    this.bnEstado = 'verificando';
+    this.equipmentService.getEquipmentByBienNacional(bn).subscribe({
+      next: (equipo) => {
+        this.bnEstado = 'valido';
+        this.bnDetalle = `${equipo.tipoEquipo} — ${equipo.ubicacion}`;
+      },
+      error: () => {
+        this.bnEstado = 'invalido';
+        this.bnDetalle = 'Ese Bien Nacional no está registrado en el inventario';
+      },
+    });
   }
 
   cargar(): void {
@@ -124,6 +156,10 @@ export class IncidentsComponent implements OnInit {
     if (this.incidentForm.invalid) {
       this.incidentForm.markAllAsTouched();
       this.snackBar.open('Completa los campos requeridos de la incidencia', 'Cerrar', { duration: 5000 });
+      return;
+    }
+    if (this.bnEstado === 'invalido') {
+      this.snackBar.open('El Bien Nacional indicado no existe en el inventario. Corrígelo o déjalo vacío.', 'Cerrar', { duration: 6000 });
       return;
     }
     this.guardando = true;

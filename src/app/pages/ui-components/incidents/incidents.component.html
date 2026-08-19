@@ -59,7 +59,20 @@
             <mat-form-field appearance="outline">
               <mat-label>Bien Nacional (opcional)</mat-label>
               <input matInput formControlName="bienNacional" placeholder="Equipo del inventario afectado">
-              <mat-hint>Vincula la incidencia a un equipo registrado</mat-hint>
+              @switch (bnEstado) {
+                @case ('verificando') {
+                  <mat-hint>Verificando en el inventario…</mat-hint>
+                }
+                @case ('valido') {
+                  <mat-hint class="hint-ok">✓ {{ bnDetalle }}</mat-hint>
+                }
+                @case ('invalido') {
+                  <mat-hint class="hint-error">✗ {{ bnDetalle }}</mat-hint>
+                }
+                @default {
+                  <mat-hint>Vincula la incidencia a un equipo registrado</mat-hint>
+                }
+              }
             </mat-form-field>
           </div>
         </div>
@@ -124,7 +137,7 @@
         <button type="button" class="incident-summary" (click)="verDetalle(inc)">
           <div class="incident-main">
             <div class="incident-title-row">
-              <span class="incident-id">#{{ inc.id }}</span>
+              <span class="bn-tag" *ngIf="inc.bienNacional">{{ inc.bienNacional }}</span>
               <span class="incident-title">{{ inc.titulo }}</span>
               <span class="priority-chip" [ngClass]="'priority-' + inc.prioridad">
                 {{ etiquetaPrioridad[inc.prioridad] }}
@@ -134,11 +147,11 @@
               </span>
             </div>
             <div class="incident-meta">
+              <span class="incident-id">#{{ inc.id }}</span>
+              <span>·</span>
               <span>{{ inc.solicitante }}</span>
               <span>·</span>
               <span>{{ inc.ubicacion }}</span>
-              <span *ngIf="inc.bienNacional">·</span>
-              <span *ngIf="inc.bienNacional">Equipo {{ inc.bienNacional }}</span>
               <span>·</span>
               <span>{{ inc.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
               <span *ngIf="inc.asignadoA">·</span>

@@ -7,12 +7,19 @@
 
   <span class="flex-1-auto"></span>
 
-  <!-- Notificaciones de incidencias (solo con sesión) -->
+  <!-- Cambio de tema claro/oscuro -->
+  <button mat-icon-button (click)="themeService.toggle()"
+    [attr.aria-label]="themeService.isDark() ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'">
+    <i-tabler class="d-flex" [name]="themeService.isDark() ? 'sun' : 'moon'"></i-tabler>
+  </button>
+
+  <!-- Notificaciones de incidencias (solo con sesión): el contador muestra
+       las incidencias pendientes para tenerlas siempre a la vista -->
   <ng-container *ngIf="authService.isLoggedIn()">
     <button mat-icon-button [matMenuTriggerFor]="notifmenu" aria-label="Notificaciones de incidencias"
       (menuOpened)="notificationService.marcarLeidas()" class="notif-bell">
       <i-tabler class="d-flex" name="bell"
-        [matBadge]="(notificationService.noLeidos$ | async) || null"
+        [matBadge]="(notificationService.pendientes$ | async) || null"
         matBadgeColor="warn" matBadgeSize="small"></i-tabler>
     </button>
 
@@ -34,8 +41,11 @@
               <span class="notif-kind" [ngClass]="'kind-' + e.tipo">{{ descripcionEvento(e.tipo) }}</span>
               <span class="notif-date">{{ e.created_at | date:'dd/MM HH:mm' }}</span>
             </div>
-            <div class="notif-item-title">#{{ e.incident_id }} — {{ e.titulo }}</div>
-            <div class="notif-item-meta">{{ e.autor }}<span *ngIf="e.comentario"> · “{{ e.comentario }}”</span></div>
+            <div class="notif-item-title">
+              <span class="bn-tag" *ngIf="e.bienNacional">{{ e.bienNacional }}</span>
+              {{ e.titulo }}
+            </div>
+            <div class="notif-item-meta">#{{ e.incident_id }} · {{ e.autor }}<span *ngIf="e.comentario"> · “{{ e.comentario }}”</span></div>
           </div>
         </button>
       </ng-container>
